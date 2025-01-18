@@ -12,6 +12,5 @@ public class PlacementPanel extends JPanel {
         super.paintComponent(g);
         // Affichage simple pour le moment
         g.setColor(Color.BLACK);
-        g.drawString("Zone de simulation", 10, 20);
     }
 }
