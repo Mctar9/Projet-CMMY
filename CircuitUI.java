@@ -14,11 +14,11 @@ public class CircuitUI {
 
         // Initialisation de la zone de placement
         placementPanel = new PlacementPanel();
-        frame.add(placementPanel, BorderLayout.CENTER);
+        frame.add(placementPanel, BorderLayout.CENTER); // Ajoute le panneau de placement au centre
 
         // Barre d'outils
         JPanel toolbar = createToolbar();
-        frame.add(toolbar, BorderLayout.SOUTH);
+        frame.add(toolbar, BorderLayout.SOUTH); // Ajoute la barre d'outils en bas
 
         // Affiche la fenêtre
         frame.setVisible(true);
@@ -26,9 +26,9 @@ public class CircuitUI {
 
     private JPanel createToolbar() {
         JPanel toolbar = new JPanel(); // Barre d'outils
-        JButton addComponentButton = new JButton("Ajouter un composant"); // Bouton d'ajout
+        JButton addComponentButton = new JButton("Ajouter un composant"); // Bouton pour ajouter un composant
 
-        // Action du bouton pour activer l'ajout de composants
+        // Action pour activer l'ajout de composants
         addComponentButton.addActionListener(e -> placementPanel.enableAddingComponent());
 
         toolbar.add(addComponentButton); // Ajoute le bouton à la barre d'outils

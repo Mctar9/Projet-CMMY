@@ -1,20 +1,33 @@
-import java.awt.*; // Cette importation permet d'utiliser les classes graphiques comme Graphics pour dessiner les composants.
+import java.awt.*;
 
 public class Component {
-    private int x;
-    private int y;
-    private final int SIZE = 50; // Taille fixe du composant: 50 pixels
+    private int x, y; // Coordonnées du composant
+    private final int SIZE = 50; // Taille fixe du composant
+    private int rotationAngle = 0; // Angle de rotation du composant
 
-    // Constructeur de la classe
     public Component(int x, int y) {
         this.x = x;
         this.y = y;
     }
-    // Méthode pour dessiner graphiquement le composant dans le panneau.
-    public void draw(Graphics g) {
-        g.setColor(Color.BLUE); // Définit la couleur de remplissage du composant comme bleu
-        g.fillRect(x, y, SIZE, SIZE); // Dessine un rectangle rempli
-        g.setColor(Color.BLACK); // Définit la couleur de la bordure du rectangle comme noir
-        g.drawRect(x, y, SIZE, SIZE); // Dessine la bordure du rectangle
+
+    // Tourne le composant de 90 degrés
+    public void rotate() {
+        rotationAngle = (rotationAngle + 90) % 360; // Incrémente l'angle par 90° et le ramène entre 0 et 359
+    }
+
+    // Vérifie si un point est dans les limites du composant
+    public boolean contains(int px, int py) {
+        return px >= x && px <= x + SIZE && py >= y && py <= y + SIZE;
+    }
+
+    // Dessine le composant en tenant compte de l'angle de rotation
+    public void draw(Graphics g, boolean isSelected) {
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setColor(isSelected ? Color.RED : Color.BLUE); // Rouge si sélectionné, sinon bleu
+        g2d.rotate(Math.toRadians(rotationAngle), x + SIZE / 2.0, y + SIZE / 2.0); // Applique la rotation
+        g2d.fillRect(x, y, SIZE, SIZE+50); // Dessine le rectangle
+        g2d.setColor(Color.BLACK);
+        g2d.drawRect(x, y, SIZE, SIZE+50); // Dessine la bordure
+        g2d.rotate(-Math.toRadians(rotationAngle), x + SIZE / 2.0, y + SIZE / 2.0); // Réinitialise la rotation
     }
 }
