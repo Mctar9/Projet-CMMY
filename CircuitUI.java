@@ -24,6 +24,7 @@ public class CircuitUI {
         frame.setVisible(true);
     }
 
+    @SuppressWarnings("unused")
     private JPanel createToolbar() {
         JPanel toolbar = new JPanel(); // Barre d'outils
         JButton addComponentButton = new JButton("Ajouter un composant"); // Bouton pour ajouter un composant

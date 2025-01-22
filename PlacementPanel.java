@@ -15,36 +15,59 @@ public class PlacementPanel extends JPanel {
     public PlacementPanel() {
         setBackground(Color.LIGHT_GRAY); // Fond gris pour le panneau
         components = new ArrayList<>(); // Initialise la liste des composants
-
+    
+        // Rend le panneau focusable pour détecter les événements clavier
+        setFocusable(true);
+    
+        // Force le focus dès l'affichage initial
+        requestFocusInWindow();
+    
         // Ajoute un MouseListener pour gérer les clics
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                // Force le focus sur le panneau lorsqu'il est cliqué
+                requestFocusInWindow();
+    
                 if (addingComponent) { // Mode ajout activé
                     addNewComponent(e.getX(), e.getY()); // Ajoute un composant aux coordonnées du clic
                     addingComponent = false; // Désactive le mode ajout
                 } else {
                     // Sélectionne un composant sous le clic
-                    selectedComponent = findComponentAtAt(e.getX(), e.getY());
+                    selectedComponent = getComponent(e.getX(), e.getY());
                     repaint(); // Met à jour l'affichage pour montrer la sélection
                 }
             }
         });
-
-        // Ajoute un KeyListener pour gérer la rotation avec la touche "R"
+    
+        // Ajoute un KeyListener pour gérer la rotation et le déplacement
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if (e.getKeyChar() == 'r' && selectedComponent != null) {
-                    selectedComponent.rotate(); // Tourne le composant sélectionné
-                    repaint(); // Met à jour l'affichage pour refléter la rotation
+                if (selectedComponent != null) { // Vérifie qu'un composant est sélectionné
+                    switch (e.getKeyCode()) {
+                        case KeyEvent.VK_UP: // Flèche vers le haut
+                            selectedComponent.move(0, -20);
+                            break;
+                        case KeyEvent.VK_DOWN: // Flèche vers le bas
+                            selectedComponent.move(0, 20);
+                            break;
+                        case KeyEvent.VK_LEFT: // Flèche vers la gauche
+                            selectedComponent.move(-20, 0);
+                            break;
+                        case KeyEvent.VK_RIGHT: // Flèche vers la droite
+                            selectedComponent.move(20, 0);
+                            break;
+                        case KeyEvent.VK_R: // Touche "R" pour rotation
+                            selectedComponent.rotate();
+                            break;
+                    }
+                    repaint(); // Met à jour l'affichage après chaque interaction
                 }
             }
         });
-
-        setFocusable(true); // Rend le panneau focusable pour détecter les événements clavier
-        requestFocusInWindow(); // Donne immédiatement le focus au panneau
     }
+    
 
     // Méthode pour activer l'ajout de composants
     public void enableAddingComponent() {
@@ -58,16 +81,14 @@ public class PlacementPanel extends JPanel {
     }
 
     // Recherche un composant à une position donnée
-    
-    public Component findComponentAtAt(int x, int y) {
-    for (Component component : components) {
-        if (component.contains(x, y)) {
-            return component; // Retourne un composant trouvé dans la liste
+    private Component getComponent(int x, int y) {
+        for (Component component : components) {
+            if (component.contains(x, y)) { // Vérifie si le clic est dans les limites du composant
+                return component;
+            }
         }
+        return null; // Aucun composant trouvé
     }
-    return null; // Aucun composant trouvé
-}
-
 
     @Override
     protected void paintComponent(Graphics g) {

@@ -10,14 +10,19 @@ public class Component {
         this.y = y;
     }
 
-    // Tourne le composant de 90 degrés
-    public void rotate() {
-        rotationAngle = (rotationAngle + 90) % 360; // Incrémente l'angle par 90° et le ramène entre 0 et 359
+    // Déplace le composant en modifiant ses coordonnées
+    public void move(int dx, int dy) {
+        x += dx; // Modifie la coordonnée X
+        y += dy; // Modifie la coordonnée Y
     }
 
     // Vérifie si un point est dans les limites du composant
     public boolean contains(int px, int py) {
         return px >= x && px <= x + SIZE && py >= y && py <= y + SIZE;
+    }
+
+    public void rotate() {
+        rotationAngle = (rotationAngle + 90) % 360; // Incrémente l'angle par 90° et le ramène entre 0 et 359
     }
 
     // Dessine le composant en tenant compte de l'angle de rotation
