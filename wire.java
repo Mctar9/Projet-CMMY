@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class Wire {
+public class wire {
     private String value; // Valeur du fil (0, 1, ou "undefined")
     private List<Component> connections; // Liste des composants connectés
     private List<int[]> path; // Liste des coordonnées (x, y) représentant le trajet du fil
