@@ -4,13 +4,13 @@ import java.util.List;
 public class wire {
     private String value; // Valeur du fil (0, 1, ou "undefined")
     private List<Component> connections; // Liste des composants connectés
-    private List<int[]> path; // Liste des coordonnées (x, y) représentant le trajet du fil
 
     // Constructeur
-    public Wire() {
-        this.value = "undefined"; // Valeur par défaut
-        this.connections = new ArrayList<>(); // Liste des connexions initialisée vide
-        this.path = new ArrayList<>(); // Liste des coordonnées initialisée vide
+    public wire(Component start, Component end) {
+        this.value = "undefined"; // Default value
+        this.connections = new ArrayList<>();
+        connections.add(start);
+        connections.add(end);
     }
 
     // Getter pour la valeur
@@ -35,8 +35,4 @@ public class wire {
         return connections;
     }
 
-    // Définir le chemin du fil
-    public void setPath(List<int[]> path) {
-        this.path = path;
-    }
 }

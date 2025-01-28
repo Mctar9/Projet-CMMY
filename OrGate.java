@@ -1,6 +1,6 @@
 public class OrGate extends MemoryComponent {
     
-    public ORGate(int id, int x, int y) {
+    public OrGate(int id, int x, int y) {
         super(id, "OR", x, y);
     }
 

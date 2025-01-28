@@ -1,6 +1,6 @@
 public class NotGate extends MemoryComponent {
     
-    public NOTGate(int id, int x, int y) {
+    public NotGate(int id, int x, int y) {
         super(id, "NOT", x, y);
     }
 

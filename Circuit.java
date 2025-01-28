@@ -3,7 +3,7 @@ import java.util.List;
 
 public class Circuit {
     private List<Component> components = new ArrayList<>();
-    private List<Wire> wires = new ArrayList<>();
+    private List<wire> wires = new ArrayList<>();
 
     // Ajouter un composant
     public void addComponent(Component component) {
@@ -12,7 +12,7 @@ public class Circuit {
 
     // Connecter deux composants avec un fil
     public void connect(Component start, Component end) {
-        Wire wire = new Wire(start, end);
+        wire wire = new wire(start, end);
         wires.add(wire);
     }
 
@@ -22,7 +22,7 @@ public class Circuit {
     }
 
     // Accéder aux fils
-    public List<Wire> getWires() {
+    public List<wire> getwires() {
         return wires;
     }
 }
