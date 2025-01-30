@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class Circuit {
+public class circuit {
     private List<Component> components = new ArrayList<>();
     private List<wire> wires = new ArrayList<>();
 
@@ -10,11 +10,11 @@ public class Circuit {
         components.add(component);
     }
 
-    // Connecter deux composants avec un fil
+  /*  // Connecter deux composants avec un fil
     public void connect(Component start, Component end) {
-        wire wire = new wire(start, end);
+       wire wire = new wire(start, end);
         wires.add(wire);
-    }
+    }*/
 
     // Accéder aux composants
     public List<Component> getComponents() {
