@@ -2,14 +2,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.awt.*;
 
-public class wire {
+public class Wire {
     private String value; // Valeur du fil (0, 1, ou "undefined")
     private List<MemoryComponent> connections; // Liste des composants connectés
 		private MemoryComponent start; // Graphical start component
     private MemoryComponent end;   // Graphical end component
     
     // Constructeur
-    public wire(MemoryComponent start, MemoryComponent end) {
+    public Wire(MemoryComponent start, MemoryComponent end) {
         this.value = "undefined"; // Default value
         this.connections = new ArrayList<>();
         connections.add(start);
