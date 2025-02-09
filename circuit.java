@@ -4,19 +4,22 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Circuit extends JPanel {
-    // Attributs existants (inchangés)
     private List<MemoryComponent> components = new ArrayList<>();
     private List<Wire> wires = new ArrayList<>();
     private MemoryComponent selectedComponent = null;
     private boolean addingComponent = false;
-    
-    // Nouveaux attributs pour la connexion
     private MemoryComponent firstSelectedForWire = null;
     private boolean connectingMode = false;
+    private boolean deletingMode = false;
+    private String addingComponentType = "AND";
+    private static final int COMPONENT_SIZE = 50;
+    private static final int COMPONENT_WIDTH = 100;
+    private static final int COMPONENT_HEIGHT = 50;
 
     public Circuit() {
         setBackground(Color.LIGHT_GRAY);
@@ -28,11 +31,31 @@ public class Circuit extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 requestFocusInWindow();
 
-                if (addingComponent) {
-                    addComponent(new MemoryComponent(1, "ADD", e.getX(), e.getY()));
+                if (deletingMode) {
+                    MemoryComponent component = getComponent(e.getX(), e.getY());
+                    if (component != null) {
+                        components.remove(component);
+                        wires.removeIf(wire -> 
+                            wire.getStart() == component || wire.getEnd() == component);
+                    } else {
+                        Wire wire = getWireAt(e.getX(), e.getY());
+                        if (wire != null) {
+                            wires.remove(wire);
+                        }
+                    }
+                    deletingMode = false;
+                    repaint();
+                }
+                else if (addingComponent) {
+                    addComponent(new MemoryComponent(
+                        components.size() + 1,
+                        addingComponentType,
+                        e.getX() - COMPONENT_WIDTH/2, // Centrage horizontal
+                        e.getY() - COMPONENT_HEIGHT/2 // Centrage vertical
+                    ));
                     addingComponent = false;
-                } 
-                else if (connectingMode) { // Partie ajoutée pour la connexion
+                }
+                else if (connectingMode) {
                     MemoryComponent clickedComponent = getComponent(e.getX(), e.getY());
                     if (clickedComponent != null) {
                         if (firstSelectedForWire == null) {
@@ -68,23 +91,24 @@ public class Circuit extends JPanel {
         });
     }
 
-    // Méthode existante (inchangée)
-    public void enableAddingComponent() {
+    public void enableAddingComponent(String type) {
         addingComponent = true;
+        addingComponentType = type;
     }
 
-    // Nouvelle méthode pour activer le mode connexion
     public void enableConnectingMode() {
         connectingMode = true;
         firstSelectedForWire = null;
     }
 
-    // Méthode existante (inchangée)
+    public void enableDeletingMode() {
+        deletingMode = true;
+    }
+
     public void addComponent(MemoryComponent component) {
         components.add(component);
     }
 
-    // Méthode existante (inchangée)
     private MemoryComponent getComponent(int x, int y) {
         for (MemoryComponent component : components) {
             if (component.contains(x, y)) {
@@ -94,16 +118,30 @@ public class Circuit extends JPanel {
         return null;
     }
 
+    private Wire getWireAt(int x, int y) {
+        final int TOLERANCE = 5;
+        for (Wire wire : wires) {
+            int x1 = wire.getStart().getCenterX();
+            int y1 = wire.getStart().getCenterY();
+            int x2 = wire.getEnd().getCenterX();
+            int y2 = wire.getEnd().getCenterY();
+            
+            double distance = Line2D.ptSegDist(x1, y1, x2, y2, x, y);
+            if (distance < TOLERANCE) {
+                return wire;
+            }
+        }
+        return null;
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        // Dessin des fils ajouté
         for (Wire wire : wires) {
             wire.draw(g);
         }
 
-        // Dessin existant des composants
         for (MemoryComponent component : components) {
             component.draw(g, component == selectedComponent);
         }

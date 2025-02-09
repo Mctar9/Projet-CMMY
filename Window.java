@@ -2,43 +2,44 @@ import javax.swing.*;
 import java.awt.*;
 
 public class Window {
-    private JFrame frame; // Fenêtre principale de l'application
-    private Circuit circuit; // Zone de placement pour les composants
+    private JFrame frame;
+    private Circuit circuit;
 
     public Window() {
-        // Initialisation de la fenêtre principale
         frame = new JFrame("Simulation de circuit");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 500);
         frame.setLayout(new BorderLayout());
 
-        // Initialisation de la zone de placement
         circuit = new Circuit();
-        frame.add(circuit, BorderLayout.CENTER); // Ajoute le panneau de placement au centre
+        frame.add(circuit, BorderLayout.CENTER);
 
-        // Barre d'outils
         JPanel toolbar = createToolbar();
-        frame.add(toolbar, BorderLayout.SOUTH); // Ajoute la barre d'outils en bas
+        frame.add(toolbar, BorderLayout.SOUTH);
 
-        // Affiche la fenêtre
         frame.setVisible(true);
     }
 
-    @SuppressWarnings("unused")
     private JPanel createToolbar() {
         JPanel toolbar = new JPanel();
-        JButton addComponentButton = new JButton("Ajouter un composant");
+    
+        // Nouveaux boutons
+        String[] components = {"AND", "OR", "NOT", "0", "1"};
+        for (String type : components) {
+            JButton btn = new JButton(type);
+            btn.addActionListener(e -> circuit.enableAddingComponent(type));
+            toolbar.add(btn);
+        }
+    
         JButton connectButton = new JButton("Relier");
-    
-        // Active le mode "ajouter un composant"
-        addComponentButton.addActionListener(e -> circuit.enableAddingComponent());
-    
-        // Active le mode "relier des composants"
+        JButton deleteButton = new JButton("Supprimer");
+        
         connectButton.addActionListener(e -> circuit.enableConnectingMode());
+        deleteButton.addActionListener(e -> circuit.enableDeletingMode());
     
-        toolbar.add(addComponentButton);
         toolbar.add(connectButton);
+        toolbar.add(deleteButton);
+        
         return toolbar;
     }
-    
 }
