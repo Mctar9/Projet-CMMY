@@ -17,7 +17,7 @@ public class MemoryComponent {
         this.x = x;
         this.y = y;
         this.isVisited = false;
-        //this.icon = loadIcon(); // À implémenter ultérieurement
+        this.icon = loadIcon(); // À implémenter ultérieurement
     }
 
     // Méthodes d'accès
@@ -29,6 +29,12 @@ public class MemoryComponent {
     public int getCenterY() { return y + HEIGHT/2; }
     public void setVisited(boolean visited) { this.isVisited = visited; }
     public boolean isVisited() { return isVisited; }
+
+
+
+
+
+//--------------INTERFACE GRAPHIQUE--------------//
 
     // Déplacement du composant
     public void move(int dx, int dy) {

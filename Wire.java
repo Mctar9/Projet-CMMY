@@ -57,7 +57,9 @@ public class Wire {
             connections.add(end);
         }
     }
-    
+
+//--------------INTERFACE GRAPHIQUE--------------//
+
     public void draw(Graphics g) {
         g.setColor(Color.BLACK);
         g.drawLine(

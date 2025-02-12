@@ -21,6 +21,37 @@ public class Circuit extends JPanel {
     private static final int COMPONENT_WIDTH = 100;
     private static final int COMPONENT_HEIGHT = 50;
 
+    public void addComponent(MemoryComponent component) {
+        components.add(component);
+    }
+
+    private MemoryComponent getComponent(int x, int y) {
+        for (MemoryComponent component : components) {
+            if (component.contains(x, y)) {
+                return component;
+            }
+        }
+        return null;
+    }
+
+    private Wire getWireAt(int x, int y) {
+        final int TOLERANCE = 5;
+        for (Wire wire : wires) {
+            int x1 = wire.getStart().getCenterX();
+            int y1 = wire.getStart().getCenterY();
+            int x2 = wire.getEnd().getCenterX();
+            int y2 = wire.getEnd().getCenterY();
+            
+            double distance = Line2D.ptSegDist(x1, y1, x2, y2, x, y);
+            if (distance < TOLERANCE) {
+                return wire;
+            }
+        }
+        return null;
+    }
+
+    //--------------INTERFACE GRAPHIQUE--------------//
+    
     public Circuit() {
         setBackground(Color.LIGHT_GRAY);
         setFocusable(true);
@@ -50,8 +81,8 @@ public class Circuit extends JPanel {
                     addComponent(new MemoryComponent(
                         components.size() + 1,
                         addingComponentType,
-                        e.getX() - COMPONENT_WIDTH/2, // Centrage horizontal
-                        e.getY() - COMPONENT_HEIGHT/2 // Centrage vertical
+                        e.getX() - COMPONENT_WIDTH/2,
+                        e.getY() - COMPONENT_HEIGHT/2
                     ));
                     addingComponent = false;
                 }
@@ -103,35 +134,6 @@ public class Circuit extends JPanel {
 
     public void enableDeletingMode() {
         deletingMode = true;
-    }
-
-    public void addComponent(MemoryComponent component) {
-        components.add(component);
-    }
-
-    private MemoryComponent getComponent(int x, int y) {
-        for (MemoryComponent component : components) {
-            if (component.contains(x, y)) {
-                return component;
-            }
-        }
-        return null;
-    }
-
-    private Wire getWireAt(int x, int y) {
-        final int TOLERANCE = 5;
-        for (Wire wire : wires) {
-            int x1 = wire.getStart().getCenterX();
-            int y1 = wire.getStart().getCenterY();
-            int x2 = wire.getEnd().getCenterX();
-            int y2 = wire.getEnd().getCenterY();
-            
-            double distance = Line2D.ptSegDist(x1, y1, x2, y2, x, y);
-            if (distance < TOLERANCE) {
-                return wire;
-            }
-        }
-        return null;
     }
 
     @Override
