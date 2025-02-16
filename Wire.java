@@ -67,4 +67,12 @@ public class Wire {
             end.getCenterX(), end.getCenterY()
         );
     }
+    
+    public boolean isPointOnWire(int x, int y, int tolerance) {
+        return Line2D.ptSegDist(
+            start.getCenterX(), start.getCenterY(),
+            end.getCenterX(), end.getCenterY(),
+            x, y
+        ) < tolerance;
+    }
 }

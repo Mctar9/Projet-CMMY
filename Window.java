@@ -14,7 +14,7 @@ public class Window {
         // Configuration du layout principal
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setDividerSize(3);
-        splitPane.setDividerLocation(150); // Largeur réduite du panel latéral
+        splitPane.setDividerLocation(200); // Largeur augmentée pour les images
         
         circuit = new Circuit();
         JPanel sidebar = createSidebar();
@@ -29,29 +29,29 @@ public class Window {
     private JPanel createSidebar() {
         JPanel sidebar = new JPanel();
         sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
-        sidebar.setBackground(new Color(44, 62, 80)); // Couleur de fond
-        sidebar.setBorder(new EmptyBorder(5, 5, 5, 5)); // Marges minimales
+        sidebar.setBackground(new Color(44, 62, 80));
+        sidebar.setBorder(new EmptyBorder(10, 10, 10, 10));
 
         // Section Portes Logiques
-        addSection(sidebar, "PORTES", new String[][] {
-            {"🟦 AND", "Porte ET"},
-            {"🟧 OR", "Porte OU"},
-            {"🟥 NOT", "Porte NON"},
-            {"🟪 XOR", "Porte OU-X"},
-            {"🟫 NAND", "Porte NON-ET"}
+        addSection(sidebar, "PORTES LOGIQUES", new String[][] {
+            {"AND", "Porte ET"},
+            {"OR", "Porte OU"},
+            {"NOT", "Porte NON"},
+            {"XOR", "Porte OU-X"},
+            {"NAND", "Porte NON-ET"}
         });
 
         // Section Entrées/Sorties
-        addSection(sidebar, "I/O", new String[][] {
-            {"🟢 1", "Signal HIGH"},
-            {"🔴 0", "Signal LOW"},
-            {"💡 LED", "Sortie LED"}
+        addSection(sidebar, "ENTRÉES/SORTIES", new String[][] {
+            {"1", "Signal HIGH"},
+            {"0", "Signal LOW"},
+            {"LED", "Sortie LED"}
         });
 
         // Section Outils
         addSection(sidebar, "OUTILS", new String[][] {
-            {"⚡ Connexion", "Mode Connexion"},
-            {"🗑️ Supprimer", "Mode Suppression"}
+            {"CONNECT", "Mode Connexion"},
+            {"DELETE", "Mode Suppression"}
         });
 
         return sidebar;
@@ -61,45 +61,60 @@ public class Window {
         JPanel section = new JPanel();
         section.setLayout(new BoxLayout(section, BoxLayout.Y_AXIS));
         section.setBackground(null);
-        section.setAlignmentX(0.0f); // Alignement à gauche
+        section.setAlignmentX(0.0F);
 
         // Titre de section
         JLabel lblTitle = new JLabel(title);
-        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 10));
-        lblTitle.setForeground(new Color(189, 195, 199)); // Couleur de texte
-        lblTitle.setBorder(new EmptyBorder(2, 2, 2, 2)); // Marges minimales
+        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        lblTitle.setForeground(new Color(189, 195, 199));
+        lblTitle.setBorder(new EmptyBorder(5, 5, 10, 5));
         section.add(lblTitle);
 
-        // Boutons
+        // Séparateur
+        JSeparator separator = new JSeparator();
+        separator.setForeground(new Color(127, 140, 141));
+        section.add(separator);
+        section.add(Box.createVerticalStrut(10));
+
+        // Boutons avec images
         for (String[] item : items) {
-            JButton btn = createCompactButton(item[0], item[1]);
-            btn.addActionListener(e -> handleButtonAction(item[0]));
+            JButton btn = createImageButton(item[0], item[1]);
+            btn.addActionListener(e -> handleButtonAction(item[0])); // Envoyer le type directement
             section.add(btn);
-            section.add(Box.createVerticalStrut(2)); // Espace minimal
+            section.add(Box.createVerticalStrut(8));
         }
 
         parent.add(section);
-        parent.add(Box.createVerticalStrut(5)); // Espace entre sections
+        parent.add(Box.createVerticalStrut(20));
     }
 
-    private JButton createCompactButton(String label, String tooltip) {
-        JButton btn = new JButton(label);
-        btn.setToolTipText(tooltip); // Info-bulle
-        btn.setBackground(new Color(52, 73, 94)); // Couleur de fond
-        btn.setForeground(Color.WHITE); // Couleur de texte
-        btn.setFont(new Font("Segoe UI", Font.PLAIN, 12)); // Police
-        btn.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4)); // Marges internes
-        btn.setMaximumSize(new Dimension(140, 30)); // Taille fixe
-        btn.setAlignmentX(0.0f);
-        btn.setFocusPainted(false); // Désactive le focus visuel
+    private JButton createImageButton(String type, String tooltip) {
+        JButton btn = new JButton();
+        btn.setToolTipText(tooltip);
+        btn.setBackground(new Color(52, 73, 94));
+        btn.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        btn.setPreferredSize(new Dimension(120, 80));
+        
+        try {
+            // Chargement de l'image
+            String imagePath = "PROJET-CMMY/img/and.png";
+            ImageIcon icon = new ImageIcon(getClass().getResource(imagePath));
+            Image scaled = icon.getImage().getScaledInstance(60, 40, Image.SCALE_SMOOTH);
+            btn.setIcon(new ImageIcon(scaled));
+        } catch (Exception e) {
+            // Fallback textuel
+            btn.setText(type);
+            btn.setForeground(Color.WHITE);
+            btn.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        }
 
         // Effet hover
         btn.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                btn.setBackground(new Color(41, 128, 185)); // Couleur au survol
+                btn.setBackground(new Color(41, 128, 185));
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                btn.setBackground(new Color(52, 73, 94)); // Couleur normale
+                btn.setBackground(new Color(52, 73, 94));
             }
         });
 
@@ -107,18 +122,16 @@ public class Window {
     }
 
     private void handleButtonAction(String command) {
-        // Extraire le type de la commande (ex: "⚡ Connexion" -> "CONNECT")
-        String type = command.split(" ")[1].toUpperCase();
-
-        switch(type) {
-            case "CONNEXION":
+        switch(command) {
+            case "CONNECT":
                 circuit.enableConnectingMode();
                 break;
-            case "SUPPRIMER":
+            case "DELETE":
                 circuit.enableDeletingMode();
                 break;
             default:
-                circuit.enableAddingComponent(type);
+                // Utiliser directement la commande comme type
+                circuit.enableAddingComponent(command.toUpperCase()); 
                 break;
         }
     }

@@ -1,4 +1,6 @@
 import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 import javax.swing.*;
 
 public class MemoryComponent {
@@ -6,18 +8,18 @@ public class MemoryComponent {
     private String type;
     private int x, y;
     private boolean isVisited;
-    private final int WIDTH = 100;
-    private final int HEIGHT = 50;
+    private final int WIDTH = 80;
+    private final int HEIGHT = 60;
     private int rotationAngle = 0;
-    private Image icon; // Préparation pour les images
+    private Image image;
 
     public MemoryComponent(int id, String type, int x, int y) {
         this.id = id;
         this.type = type;
-        this.x = x;
-        this.y = y;
+        this.x = x - WIDTH / 2; // Centrage sur le point de clic
+        this.y = y - HEIGHT / 2;
         this.isVisited = false;
-        this.icon = loadIcon(); // À implémenter ultérieurement
+        this.image = loadImage();
     }
 
     // Méthodes d'accès
@@ -25,16 +27,10 @@ public class MemoryComponent {
     public String getType() { return type; }
     public int getX() { return x; }
     public int getY() { return y; }
-    public int getCenterX() { return x + WIDTH/2; }
-    public int getCenterY() { return y + HEIGHT/2; }
+    public int getCenterX() { return x + WIDTH / 2; }
+    public int getCenterY() { return y + HEIGHT / 2; }
     public void setVisited(boolean visited) { this.isVisited = visited; }
     public boolean isVisited() { return isVisited; }
-
-
-
-
-
-//--------------INTERFACE GRAPHIQUE--------------//
 
     // Déplacement du composant
     public void move(int dx, int dy) {
@@ -53,54 +49,63 @@ public class MemoryComponent {
         rotationAngle = (rotationAngle + 90) % 360;
     }
 
-    // Dessin du composant
+    // Dessin du composant avec image
     public void draw(Graphics g, boolean isSelected) {
         Graphics2D g2d = (Graphics2D) g;
-        
-        // Couleur de fond
-        g2d.setColor(isSelected ? new Color(255, 100, 100) : new Color(70, 130, 180));
-        
-        // Applique la rotation
-        g2d.rotate(Math.toRadians(rotationAngle), getCenterX(), getCenterY());
-        
-        // Dessine le rectangle principal
-        g2d.fillRoundRect(x, y, WIDTH, HEIGHT, 15, 15);
-        
-        // Dessine la bordure
-        g2d.setColor(isSelected ? Color.RED : Color.DARK_GRAY);
-        g2d.setStroke(new BasicStroke(2));
-        g2d.drawRoundRect(x, y, WIDTH, HEIGHT, 15, 15);
+        AffineTransform originalTransform = g2d.getTransform();
 
-        // Dessine le texte centré
-        drawCenteredText(g2d);
-        
-        // Réinitialise la rotation
-        g2d.rotate(-Math.toRadians(rotationAngle), getCenterX(), getCenterY());
+        // Rotation autour du centre
+        g2d.rotate(Math.toRadians(rotationAngle), 
+                  x + WIDTH / 2.0, 
+                  y + HEIGHT / 2.0);
+
+        // Dessin de l'image
+        g2d.drawImage(image, x, y, null);
+
+        // Bordure de sélection
+        if (isSelected) {
+            g2d.setColor(Color.RED);
+            g2d.setStroke(new BasicStroke(2));
+            g2d.drawRect(x, y, WIDTH, HEIGHT);
+        }
+
+        g2d.setTransform(originalTransform);
     }
 
-    private void drawCenteredText(Graphics2D g2d) {
-        g2d.setColor(Color.WHITE);
-        g2d.setFont(new Font("Arial", Font.BOLD, 14));
-        
-        FontMetrics fm = g2d.getFontMetrics();
-        String text = type.toUpperCase();
-        
-        int textWidth = fm.stringWidth(text);
-        int textX = x + (WIDTH - textWidth)/2;
-        int textY = y + (HEIGHT/2) + (fm.getAscent() - fm.getDescent())/2;
-        
-        g2d.drawString(text, textX, textY);
-    }
-
-    // Méthode préparatoire pour les images
-    private Image loadIcon() {
+    // Chargement de l'image
+    private Image loadImage() {
         try {
-            // Exemple pour charger une image :
-            // return new ImageIcon(getClass().getResource("/icons/" + type + ".png")).getImage();
-            return null;
+            // Chemin absolu depuis la racine des ressources
+            String imagePath = "/img/" + this.type.toLowerCase() + ".png";
+            System.out.println("Trying to load: " + imagePath); // Debug
+            
+            ImageIcon icon = new ImageIcon(getClass().getResource(imagePath));
+            if (icon.getImage() == null) throw new Exception();
+            
+            return icon.getImage().getScaledInstance(WIDTH, HEIGHT, Image.SCALE_SMOOTH);
         } catch (Exception e) {
-            System.out.println("Image non trouvée pour " + type);
-            return null;
+            System.err.println("ERREUR: Image non trouvée pour " + type);
+            return createFallbackImage();
         }
     }
-}
+
+    // Image de secours
+    private BufferedImage createFallbackImage() {
+        BufferedImage img = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = img.createGraphics();
+        
+        // Fond semi-transparent
+        g2d.setColor(new Color(255, 0, 0, 100));
+        g2d.fillRect(0, 0, WIDTH, HEIGHT);
+        
+        // Texte d'erreur
+        g2d.setColor(Color.BLACK);
+        g2d.setFont(new Font("Arial", Font.BOLD, 10));
+        String text = "Image manquante";
+        int textWidth = g2d.getFontMetrics().stringWidth(text);
+        g2d.drawString(text, (WIDTH - textWidth)/2, HEIGHT/2);
+        
+        g2d.dispose();
+        return img;
+    }
+}   
