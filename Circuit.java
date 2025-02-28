@@ -108,4 +108,85 @@ public class Circuit extends JPanel {
             component.draw(g, component == selectedComponent);
         }
     }
+
+    // Méthode pour simuler le circuit
+    public void simuler() {
+        // Initialiser tous les fils à "undefined"
+        for (Wire wire : wires) {
+            wire.setValue("undefined");
+        }
+
+        // Nombre maximum d'itérations pour éviter les boucles infinies
+        int MAX_ITERATIONS = 1000;
+        boolean stable = false;
+
+        // Boucle de simulation
+        for (int i = 0; i < MAX_ITERATIONS; i++) {
+            stable = true;
+
+            // Parcourir tous les fils
+            for (Wire wire : wires) {
+                String newValue = calculerValeurFil(wire);
+
+                // Si la valeur du fil change, mettre à jour et marquer comme instable
+                if (!newValue.equals(wire.getValue())) {
+                    wire.setValue(newValue);
+                    stable = false;
+                }
+            }
+
+            // Si le circuit est stable, on arrête la simulation
+            if (stable) {
+                break;
+            }
+        }
+
+        // Si le circuit n'est pas stable après MAX_ITERATIONS, lever une exception
+        if (!stable) {
+            throw new RuntimeException("Circuit instable : pas de point fixe trouvé après " + MAX_ITERATIONS + " itérations.");
+        }
+    }
+
+    // Méthode pour calculer la valeur d'un fil en fonction des composants connectés
+    private String calculerValeurFil(Wire wire) {
+        // Récupérer les composants connectés au fil
+        List<MemoryComponent> composantsConnectes = wire.getConnections();
+
+        // Calculer la valeur du fil en fonction des composants
+        // (Cette partie dépend de la logique spécifique de chaque composant YOUCEF help me here bro)
+        String valeur = "undefined";
+
+        for (MemoryComponent composant : composantsConnectes) {
+            if (composant instanceof AndGate) {
+                valeur = calculerValeurAND(composant);
+            } else if (composant instanceof OrGate) {
+                valeur = calculerValeurOR(composant);
+            } else if (composant instanceof NotGate) {
+                valeur = calculerValeurNOT(composant);
+            }
+            // Ajouter d'autres types de composants ici si nécessaire,YOUUUUUCEEEF <3
+        }
+
+        return valeur;
+    }
+
+    // Méthodes pour calculer les valeurs des portes logiques
+    private String calculerValeurAND(MemoryComponent composant) {
+        // Logique pour la porte AND YOUUUUCEFF HELPPP!!!
+        // Exemple : si toutes les entrées sont "1", la sortie est "1", sinon "0" c'est ca Youcef !!!?
+        return "0"; // À implémenter avec youcef
+    }
+
+    private String calculerValeurOR(MemoryComponent composant) {
+        // Logique pour la porte OR
+        // Exemple : si au moins une entrée est "1", la sortie est "1", sinon "0" c'est ca Youcef !!!?
+        return "0"; // À implémenter avec youcef
+    }
+
+    private String calculerValeurNOT(MemoryComponent composant) {
+        // Logique pour la porte NOT
+        // Exemple : si l'entrée est "1", la sortie est "0", et vice versa c'est ca Youcef !!!?
+        return "0"; // À implémenter avec youcef
+    }
 }
+
