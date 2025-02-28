@@ -1,0 +1,175 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\title{Documentation des Warnings en Java}
+\author{Riyad Derguini}
+\date{15 fevrier 2025}
+
+\begin{document}
+
+\maketitle
+
+\section*{Introduction}
+Ce document recense et explique les différents warnings rencontrés lors du développement en Java. Chaque warning est documenté avec une explication et des solutions pour le résoudre.
+
+\section*{Liste des Warnings}
+
+\subsection*{1. Warning: \texttt{[serial] serializable class Circuit has no definition of serialVersionUID}}
+
+\subsubsection*{Description}
+Ce warning apparaît lorsqu'une classe implémente l'interface \texttt{java.io.Serializable} mais ne définit pas explicitement de champ \texttt{serialVersionUID}. Le \texttt{serialVersionUID} est un identifiant de version utilisé pour la sérialisation et la désérialisation des objets.
+
+\subsubsection*{Pourquoi ce warning apparaît-il ?}
+Java utilise \texttt{serialVersionUID} pour vérifier la compatibilité des versions d'une classe lors de la désérialisation. Si ce champ n'est pas défini explicitement, Java en génère un automatiquement basé sur les détails de la classe (comme les noms des champs et des méthodes). Cependant, cela peut causer des problèmes de compatibilité si la classe est modifiée (par exemple, si des champs sont ajoutés ou supprimés).
+
+\subsubsection*{Comment résoudre ce warning ?}
+Pour résoudre ce warning, ajoutez un champ \texttt{serialVersionUID} à la classe concernée. Voici un exemple :
+
+\begin{lstlisting}[language=java]
+import java.io.Serializable;
+
+public class Circuit implements Serializable {
+    private static final long serialVersionUID = 1L; // Ajoutez cette ligne
+
+    // Le reste de votre code...
+}
+\end{lstlisting}
+
+\subsubsection*{Conseils}
+\begin{itemize}
+    \item Utilisez une valeur fixe pour \texttt{serialVersionUID} (par exemple, \texttt{1L}).
+    \item Si vous modifiez la structure de la classe (ajout/suppression de champs), mettez à jour \texttt{serialVersionUID} si nécessaire pour éviter des problèmes de désérialisation.
+\end{itemize}
+
+\subsection*{2. Warning: \texttt{[serial] non-transient instance field of a serializable class declared with a non-serializable type}}
+
+\subsubsection*{Description}
+Ce warning apparaît lorsqu'une classe sérialisable contient un champ d'instance non-transient dont le type n'est pas sérialisable. Dans votre cas, les champs suivants déclenchent ce warning :
+\begin{itemize}
+    \item \texttt{private List<MemoryComponent> components = new ArrayList<>();}
+    \item \texttt{private List<Wire> wires = new ArrayList<>();}
+    \item \texttt{private MemoryComponent selectedComponent = null;}
+    \item \texttt{private MemoryComponent firstSelectedForWire = null;}
+\end{itemize}
+
+\subsubsection*{Pourquoi ce warning apparaît-il ?}
+Lors de la sérialisation, tous les champs non-transient d'une classe sérialisable doivent également être sérialisables. Si un champ est d'un type non-sérialisable (comme \texttt{MemoryComponent} ou \texttt{Wire}), Java ne peut pas garantir que l'objet sera correctement sérialisé, d'où le warning.
+
+\subsubsection*{Comment résoudre ce warning ?}
+Voici les solutions possibles :
+
+1. **Rendre les types sérialisables** :
+   - Assurez-vous que les classes \texttt{MemoryComponent} et \texttt{Wire} implémentent \texttt{java.io.Serializable}.
+   - Exemple :
+     \begin{lstlisting}[language=java]
+     public class MemoryComponent implements Serializable {
+         private static final long serialVersionUID = 1L;
+         // Le reste de votre code...
+     }
+
+     public class Wire implements Serializable {
+         private static final long serialVersionUID = 1L;
+         // Le reste de votre code...
+     }
+     \end{lstlisting}
+
+2. **Marquer les champs comme \texttt{transient}** :
+   - Si les champs ne doivent pas être sérialisés, marquez-les comme \texttt{transient}. Cela indique à Java d'ignorer ces champs lors de la sérialisation.
+   - Exemple :
+     \begin{lstlisting}[language=java]
+     private transient List<MemoryComponent> components = new ArrayList<>();
+     private transient List<Wire> wires = new ArrayList<>();
+     private transient MemoryComponent selectedComponent = null;
+     private transient MemoryComponent firstSelectedForWire = null;
+     \end{lstlisting}
+
+3. **Utiliser des types sérialisables** :
+   - Si possible, remplacez les types non-sérialisables par des types sérialisables. Par exemple, utilisez \texttt{ArrayList} au lieu d'une liste personnalisée non-sérialisable.
+
+\subsubsection*{Conseils}
+\begin{itemize}
+    \item Si les champs doivent être sérialisés, assurez-vous que leurs types implémentent \texttt{Serializable}.
+    \item Si les champs ne doivent pas être sérialisés, utilisez \texttt{transient}.
+    \item Évitez d'utiliser des types non-sérialisables dans des classes sérialisables.
+\end{itemize}
+
+\subsection*{3. Warning: \texttt{[this-escape] possible 'this' escape before subclass is fully initialized}}
+
+\subsubsection*{Description}
+Ce warning apparaît lorsque vous utilisez \texttt{this} dans un constructeur avant que l'objet ne soit complètement initialisé. Dans votre cas, le warning est déclenché par la ligne suivante :
+\begin{lstlisting}[language=java]
+setBackground(Color.LIGHT_GRAY); // W: warning: [this-escape] possible 'this' escape before subclass is fully initialized
+\end{lstlisting}
+
+\subsubsection*{Pourquoi ce warning apparaît-il ?}
+Lorsque vous appelez une méthode ou accédez à \texttt{this} dans un constructeur, il est possible que des sous-classes ne soient pas encore complètement initialisées. Cela peut entraîner des comportements inattendus ou des erreurs si des méthodes de la sous-classe sont appelées avant que celle-ci ne soit prête.
+
+\subsubsection*{Comment résoudre ce warning ?}
+Voici les solutions possibles :
+
+1. **Déplacer l'appel de méthode après l'initialisation** :
+   - Déplacez l'appel de \texttt{setBackground} après l'initialisation complète de l'objet.
+   - Exemple :
+     \begin{lstlisting}[language=java]
+     public Circuit() {
+         // Initialisation des autres champs...
+         setBackground(Color.LIGHT_GRAY); // Déplacer ici
+     }
+     \end{lstlisting}
+
+2. **Utiliser une méthode d'initialisation séparée** :
+   - Créez une méthode distincte pour effectuer les opérations qui nécessitent \texttt{this} et appelez-la après la construction de l'objet.
+   - Exemple :
+     \begin{lstlisting}[language=java]
+     public Circuit() {
+         // Initialisation des autres champs...
+         initialize();
+     }
+
+     private void initialize() {
+         setBackground(Color.LIGHT_GRAY);
+     }
+     \end{lstlisting}
+
+3. **Éviter d'utiliser \texttt{this} dans le constructeur** :
+   - Si possible, évitez d'utiliser \texttt{this} ou des méthodes qui y font référence dans le constructeur.
+
+\subsubsection*{Conseils}
+\begin{itemize}
+    \item Soyez prudent lorsque vous utilisez \texttt{this} dans un constructeur, surtout si la classe est conçue pour être étendue (héritage).
+    \item Si vous ne pouvez pas éviter d'utiliser \texttt{this}, assurez-vous que toutes les sous-classes sont correctement initialisées avant d'appeler des méthodes qui dépendent de leur état.
+\end{itemize}
+
+\end{document}
