@@ -13,7 +13,7 @@ public class Circuit extends JPanel {
     private List<Wire> wires = new ArrayList<>();
     private MemoryComponent selectedComponent = null;
     private boolean addingComponent = false;
-    
+
     // Nouveaux attributs pour la connexion
     private MemoryComponent firstSelectedForWire = null;
     private boolean connectingMode = false;
@@ -31,8 +31,7 @@ public class Circuit extends JPanel {
                 if (addingComponent) {
                     addComponent(new MemoryComponent(1, "ADD", e.getX(), e.getY()));
                     addingComponent = false;
-                } 
-                else if (connectingMode) { // Partie ajoutée pour la connexion
+                } else if (connectingMode) { // Partie ajoutée pour la connexion
                     MemoryComponent clickedComponent = getComponent(e.getX(), e.getY());
                     if (clickedComponent != null) {
                         if (firstSelectedForWire == null) {
@@ -43,8 +42,7 @@ public class Circuit extends JPanel {
                             connectingMode = false;
                         }
                     }
-                } 
-                else {
+                } else {
                     selectedComponent = getComponent(e.getX(), e.getY());
                 }
                 repaint();
@@ -56,11 +54,21 @@ public class Circuit extends JPanel {
             public void keyPressed(KeyEvent e) {
                 if (selectedComponent != null) {
                     switch (e.getKeyCode()) {
-                        case KeyEvent.VK_UP:    selectedComponent.move(0, -20); break;
-                        case KeyEvent.VK_DOWN:  selectedComponent.move(0, 20); break;
-                        case KeyEvent.VK_LEFT:  selectedComponent.move(-20, 0); break;
-                        case KeyEvent.VK_RIGHT: selectedComponent.move(20, 0); break;
-                        case KeyEvent.VK_R:     selectedComponent.rotate(); break;
+                        case KeyEvent.VK_UP:
+                            selectedComponent.move(0, -20);
+                            break;
+                        case KeyEvent.VK_DOWN:
+                            selectedComponent.move(0, 20);
+                            break;
+                        case KeyEvent.VK_LEFT:
+                            selectedComponent.move(-20, 0);
+                            break;
+                        case KeyEvent.VK_RIGHT:
+                            selectedComponent.move(20, 0);
+                            break;
+                        case KeyEvent.VK_R:
+                            selectedComponent.rotate();
+                            break;
                     }
                     repaint();
                 }
