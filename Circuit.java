@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Circuit extends JPanel {
-    // Attributs existants (inchangés)
     private List<MemoryComponent> components = new ArrayList<>();
     private List<Wire> wires = new ArrayList<>();
     private MemoryComponent selectedComponent = null;
@@ -21,7 +20,8 @@ public class Circuit extends JPanel {
     public Circuit() {
         setBackground(Color.LIGHT_GRAY);
         setFocusable(true);
-        requestFocusInWindow();
+        setupEventListeners();
+    }
 
         addMouseListener(new MouseAdapter() {
             @Override
@@ -100,6 +100,31 @@ public class Circuit extends JPanel {
             }
         }
         return null;
+    }
+
+    // Gestion des modes
+    public void enableAddingComponent(String type) {
+        resetModes();
+        addingComponent = true;
+        addingComponentType = type != null ? type.toUpperCase() : "ADD";
+    }
+
+    public void enableConnectingMode() {
+        resetModes();
+        connectingMode = true;
+        firstSelectedForWire = null;
+    }
+
+    public void enableDeletingMode() {
+        resetModes();
+        deletingMode = true;
+    }
+
+    private void resetModes() {
+        addingComponent = false;
+        connectingMode = false;
+        deletingMode = false;
+        firstSelectedForWire = null;
     }
 
     @Override
