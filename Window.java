@@ -43,22 +43,4 @@ public class Window {
         return toolbar;
     }
 
-    /**
-     *
-     */
-    private void keyBoardShortcut() { // methodes spécifique au recoursis clavier
-        Action exitaction = new AbstractAction() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                System.exit(0);
-            }
-        };
-
-        JRootPane rootPane = frame.getRootPane();
-        KeyStroke exitStroke = KeyStroke.getKeyStroke("control Q");
-        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(exitStroke, "exit"); // lire la touche CTRL Q à une
-                                                                                         // chaine de caractere
-        rootPane.getActionMap().put("exit", exitaction); // associer cette chaine de caractere a une action
-    }
-
 }
