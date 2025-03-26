@@ -1,6 +1,9 @@
 import javax.swing.*;
 import java.awt.*;
 import javax.swing.border.*;
+import java.awt.event.MouseAdapter;
+
+import org.w3c.dom.events.MouseEvent;
 
 public class Window {
     private JFrame frame;
@@ -15,6 +18,9 @@ public class Window {
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setDividerSize(3);
         splitPane.setDividerLocation(200); // Largeur augmentée pour les images
+
+        frame = new JFrame("Logic Circuit Designer");
+        frame.setJMenuBar(createSimulationMenuBar()); // Ajout de la barre de menu
         
         circuit = new Circuit();
         JPanel sidebar = createSidebar();
@@ -135,4 +141,69 @@ public class Window {
                 break;
         }
     }
+    private JMenuBar createSimulationMenuBar() {
+        JMenuBar menuBar = new JMenuBar();
+        menuBar.setBackground(Color.WHITE);
+        menuBar.setLayout(new BoxLayout(menuBar, BoxLayout.X_AXIS));
+        menuBar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(200, 200, 200)));
+    
+        // Contrôles de simulation centrés
+        JPanel centerPanel = new JPanel();
+        centerPanel.setBackground(Color.GREEN);
+        centerPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 2));
+        
+        JButton startButton = createToolButton("▶", "Démarrer (Space)");
+        JButton pauseButton = createToolButton("⏸", "Pause (P)");
+        JButton resetButton = createToolButton("↺", "Réinitialiser (R)");
+        
+        centerPanel.add(startButton);
+        centerPanel.add(pauseButton);
+        centerPanel.add(resetButton);
+    
+        // Sélecteur de vitesse compact à droite
+        JPanel rightPanel = new JPanel();
+        rightPanel.setBackground(Color.GREEN);
+        rightPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 2));
+        
+        JComboBox<String> speedSelector = new JComboBox<>(new String[]{"1x", "2x", "5x", "Max"});
+        speedSelector.setPrototypeDisplayValue("1x");  // Réduit la largeur
+        speedSelector.setMaximumSize(new Dimension(60, 25));
+        speedSelector.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        
+        JLabel clockLabel = new JLabel("Horloge: 0");
+        JLabel statusLabel = new JLabel("Statut: Arrêté");
+    
+        // Assemblage final
+        menuBar.add(Box.createHorizontalGlue());
+        menuBar.add(centerPanel);
+        menuBar.add(Box.createHorizontalGlue());
+        rightPanel.add(new JLabel("Vitesse:"));
+        rightPanel.add(speedSelector);
+        rightPanel.add(Box.createHorizontalStrut(15));
+        rightPanel.add(clockLabel);
+        rightPanel.add(Box.createHorizontalStrut(5));
+        rightPanel.add(statusLabel);
+        menuBar.add(rightPanel);
+    
+        return menuBar;
+    }
+    private JButton createToolButton(String iconText, String tooltip) {
+    JButton btn = new JButton(iconText);
+    btn.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+    btn.setToolTipText(tooltip);
+    btn.setBackground(Color.WHITE);
+    btn.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+    
+    // Style hover
+    btn.addMouseListener(new MouseAdapter() {
+        public void mouseEntered(MouseEvent e) {
+            btn.setBackground(new Color(240, 240, 240));
+        }
+        public void mouseExited(MouseEvent e) {
+            btn.setBackground(Color.WHITE);
+        }
+    });
+    
+    return btn;
+}
 }

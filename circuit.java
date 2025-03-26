@@ -40,6 +40,29 @@ public class Circuit extends JPanel {
                 repaint();
             }
         });
+        // Gestion du drag-and-drop
+        addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if (selectedComponent != null) {
+                    // Déplacer le composant sélectionné
+                    selectedComponent.moveTo(e.getX(), e.getY());
+                    repaint();
+                }
+            }
+        });
+        // Gestion du clic pour sélectionner un composant
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                selectedComponent = getComponent(e.getX(), e.getY());
+            }
+    
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                selectedComponent = null; // Désélectionner après le déplacement
+            }
+        });    
     }
 
     private void handleMouseClick(MouseEvent e) {
@@ -102,13 +125,17 @@ public class Circuit extends JPanel {
         if (selectedComponent != null) {
             int moveStep = 10; // Pas de déplacement réduit pour plus de précision
             switch (e.getKeyCode()) {
+                /*
                 case KeyEvent.VK_UP:    selectedComponent.move(0, -moveStep); break;
                 case KeyEvent.VK_DOWN:  selectedComponent.move(0, moveStep); break;
                 case KeyEvent.VK_LEFT:  selectedComponent.move(-moveStep, 0); break;
                 case KeyEvent.VK_RIGHT: selectedComponent.move(moveStep, 0); break;
+                
                 case KeyEvent.VK_R:     selectedComponent.rotate(); break;
+                */
             }
         }
+        repaint();
     }
 
     // Méthodes d'accès aux composants

@@ -32,10 +32,18 @@ public class MemoryComponent {
     public void setVisited(boolean visited) { this.isVisited = visited; }
     public boolean isVisited() { return isVisited; }
 
-    // Déplacement du composant
+    /* Déplacement du composant 
     public void move(int dx, int dy) {
         x += dx;
         y += dy;
+    }
+    */
+    
+
+    // Centrer le composant sur la position de la souris
+    public void moveTo(int x, int y) {
+        this.x = x - WIDTH / 2;
+        this.y = y - HEIGHT / 2;
     }
 
     // Vérification du clic
@@ -53,22 +61,20 @@ public class MemoryComponent {
     public void draw(Graphics g, boolean isSelected) {
         Graphics2D g2d = (Graphics2D) g;
         AffineTransform originalTransform = g2d.getTransform();
-
-        // Rotation autour du centre
-        g2d.rotate(Math.toRadians(rotationAngle), 
-                  x + WIDTH / 2.0, 
-                  y + HEIGHT / 2.0);
-
+    
+        // Rotation
+        g2d.rotate(Math.toRadians(rotationAngle), x + WIDTH / 2.0, y + HEIGHT / 2.0);
+    
         // Dessin de l'image
         g2d.drawImage(image, x, y, null);
-
+    
         // Bordure de sélection
         if (isSelected) {
             g2d.setColor(Color.RED);
             g2d.setStroke(new BasicStroke(2));
             g2d.drawRect(x, y, WIDTH, HEIGHT);
         }
-
+    
         g2d.setTransform(originalTransform);
     }
 
