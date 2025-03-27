@@ -2,7 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import javax.swing.border.*;
 import java.awt.event.MouseAdapter;
-
+import java.awt.event.ActionEvent;
 import org.w3c.dom.events.MouseEvent;
 
 public class Window {
@@ -30,6 +30,21 @@ public class Window {
         
         frame.add(splitPane);
         frame.setVisible(true);
+        setupShortcuts();
+    }
+    private void setupShortcuts(){
+        AbstractAction closeAction = new AbstractAction(){
+            @Override
+            public void actionPerformed( ActionEvent e){
+                frame.dispose();
+                System.exit(0);
+            }
+        };
+        
+        JRootPane rootPane = frame.getRootPane();
+        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("ctrl Q"), "closeAction");
+        rootPane.getActionMap().put("closeAction", closeAction);
+
     }
 
     private JPanel createSidebar() {
