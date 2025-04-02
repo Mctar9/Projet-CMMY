@@ -10,12 +10,12 @@ public class Circuit extends JPanel {
     private List<Wire> wires = new ArrayList<>();
     private MemoryComponent selectedComponent = null;
     private MemoryComponent firstSelectedForWire = null;
-    
+
     // États des modes
     private boolean addingComponent = false;
     private boolean connectingMode = false;
     private boolean deletingMode = false;
-    
+
     private String addingComponentType;
 
     public Circuit() {
@@ -57,12 +57,12 @@ public class Circuit extends JPanel {
             public void mousePressed(MouseEvent e) {
                 selectedComponent = getComponent(e.getX(), e.getY());
             }
-    
+
             @Override
             public void mouseReleased(MouseEvent e) {
                 selectedComponent = null; // Désélectionner après le déplacement
             }
-        });    
+        });
     }
 
     private void handleMouseClick(MouseEvent e) {
@@ -85,8 +85,7 @@ public class Circuit extends JPanel {
         MemoryComponent component = getComponent(e.getX(), e.getY());
         if (component != null) {
             components.remove(component);
-            wires.removeIf(wire -> 
-                wire.getStart() == component || wire.getEnd() == component);
+            wires.removeIf(wire -> wire.getStart() == component || wire.getEnd() == component);
         } else {
             Wire wire = getWireAt(e.getX(), e.getY());
             if (wire != null) {
@@ -97,11 +96,10 @@ public class Circuit extends JPanel {
 
     private void addNewComponent(MouseEvent e) {
         components.add(new MemoryComponent(
-            components.size() + 1,
-            addingComponentType,
-            e.getX(), // Le centrage est géré dans le constructeur de MemoryComponent
-            e.getY()
-        ));
+                components.size() + 1,
+                addingComponentType,
+                e.getX(), // Le centrage est géré dans le constructeur de MemoryComponent
+                e.getY()));
     }
 
     private void handleWireConnection(MouseEvent e) {
@@ -125,14 +123,25 @@ public class Circuit extends JPanel {
         if (selectedComponent != null) {
             int moveStep = 10; // Pas de déplacement réduit pour plus de précision
             switch (e.getKeyCode()) {
+
                 /*
-                case KeyEvent.VK_UP:    selectedComponent.move(0, -moveStep); break;
-                case KeyEvent.VK_DOWN:  selectedComponent.move(0, moveStep); break;
-                case KeyEvent.VK_LEFT:  selectedComponent.move(-moveStep, 0); break;
-                case KeyEvent.VK_RIGHT: selectedComponent.move(moveStep, 0); break;
-                
-                case KeyEvent.VK_R:     selectedComponent.rotate(); break;
-                */
+                 * case KeyEvent.VK_UP:
+                 * selectedComponent.move(0, -moveStep);
+                 * break;
+                 * case KeyEvent.VK_DOWN:
+                 * selectedComponent.move(0, moveStep);
+                 * break;
+                 * case KeyEvent.VK_LEFT:
+                 * selectedComponent.move(-moveStep, 0);
+                 * break;
+                 * case KeyEvent.VK_RIGHT:
+                 * selectedComponent.move(moveStep, 0);
+                 * break;
+                 * 
+                 * case KeyEvent.VK_R:
+                 * selectedComponent.rotate();
+                 * break;
+                 */
             }
         }
         repaint();
@@ -141,17 +150,17 @@ public class Circuit extends JPanel {
     // Méthodes d'accès aux composants
     private MemoryComponent getComponent(int x, int y) {
         return components.stream()
-            .filter(c -> c.contains(x, y))
-            .findFirst()
-            .orElse(null);
+                .filter(c -> c.contains(x, y))
+                .findFirst()
+                .orElse(null);
     }
 
     private Wire getWireAt(int x, int y) {
         final int TOLERANCE = 5;
         return wires.stream()
-            .filter(w -> w.isPointOnWire(x, y, TOLERANCE))
-            .findFirst()
-            .orElse(null);
+                .filter(w -> w.isPointOnWire(x, y, TOLERANCE))
+                .findFirst()
+                .orElse(null);
     }
 
     // Gestion des modes
@@ -172,10 +181,10 @@ public class Circuit extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        
+
         // Dessiner les fils en premier
         wires.forEach(wire -> wire.draw(g));
-        
+
         // Dessiner les composants par-dessus
         components.forEach(comp -> comp.draw(g, comp == selectedComponent));
     }

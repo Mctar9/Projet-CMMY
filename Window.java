@@ -13,34 +13,36 @@ public class Window {
         frame = new JFrame("Logic Circuit Designer");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(1200, 800);
-        
+
         // Configuration du layout principal
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setDividerSize(3);
         splitPane.setDividerLocation(200); // Largeur augmentée pour les images
 
+        frame.getContentPane().setBackground(Color.WHITE); // zone princupal en fond blanc
         frame = new JFrame("Logic Circuit Designer");
         frame.setJMenuBar(createSimulationMenuBar()); // Ajout de la barre de menu
-        
+
         circuit = new Circuit();
         JPanel sidebar = createSidebar();
-        
+        splitPane.setBorder(BorderFactory.createEmptyBorder());
         splitPane.setLeftComponent(sidebar);
         splitPane.setRightComponent(circuit);
-        
+
         frame.add(splitPane);
         frame.setVisible(true);
         setupShortcuts();
     }
-    private void setupShortcuts(){
-        AbstractAction closeAction = new AbstractAction(){
+
+    private void setupShortcuts() {
+        AbstractAction closeAction = new AbstractAction() {
             @Override
-            public void actionPerformed( ActionEvent e){
+            public void actionPerformed(ActionEvent e) {
                 frame.dispose();
                 System.exit(0);
             }
         };
-        
+
         JRootPane rootPane = frame.getRootPane();
         rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("ctrl Q"), "closeAction");
         rootPane.getActionMap().put("closeAction", closeAction);
@@ -55,24 +57,24 @@ public class Window {
 
         // Section Portes Logiques
         addSection(sidebar, "PORTES LOGIQUES", new String[][] {
-            {"AND", "Porte ET"},
-            {"OR", "Porte OU"},
-            {"NOT", "Porte NON"},
-            {"XOR", "Porte OU-X"},
-            {"NAND", "Porte NON-ET"}
+                { "AND", "Porte ET" },
+                { "OR", "Porte OU" },
+                { "NOT", "Porte NON" },
+                { "XOR", "Porte OU-X" },
+                { "NAND", "Porte NON-ET" }
         });
 
         // Section Entrées/Sorties
         addSection(sidebar, "ENTRÉES/SORTIES", new String[][] {
-            {"1", "Signal HIGH"},
-            {"0", "Signal LOW"},
-            {"LED", "Sortie LED"}
+                { "1", "Signal HIGH" },
+                { "0", "Signal LOW" },
+                { "LED", "Sortie LED" }
         });
 
         // Section Outils
         addSection(sidebar, "OUTILS", new String[][] {
-            {"CONNECT", "Mode Connexion"},
-            {"DELETE", "Mode Suppression"}
+                { "CONNECT", "Mode Connexion" },
+                { "DELETE", "Mode Suppression" }
         });
 
         return sidebar;
@@ -86,9 +88,10 @@ public class Window {
 
         // Titre de section
         JLabel lblTitle = new JLabel(title);
-        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        lblTitle.setForeground(new Color(189, 195, 199));
-        lblTitle.setBorder(new EmptyBorder(5, 5, 10, 5));
+        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        lblTitle.setForeground(new Color(170, 170, 170));
+        lblTitle.setBorder(new EmptyBorder(8, 8, 8, 8));
+        lblTitle.setHorizontalAlignment(SwingConstants.LEFT);
         section.add(lblTitle);
 
         // Séparateur
@@ -112,10 +115,10 @@ public class Window {
     private JButton createImageButton(String type, String tooltip) {
         JButton btn = new JButton();
         btn.setToolTipText(tooltip);
-        btn.setBackground(new Color(52, 73, 94));
+        btn.setBackground(new Color(50, 50, 50));
         btn.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         btn.setPreferredSize(new Dimension(120, 80));
-        
+
         try {
             // Chargement de l'image
             String imagePath = "PROJET-CMMY/img/and.png";
@@ -132,10 +135,19 @@ public class Window {
         // Effet hover
         btn.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                btn.setBackground(new Color(41, 128, 185));
+                btn.setBackground(new Color(65, 65, 65));
+                btn.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(new Color(100, 100, 100)),
+                        BorderFactory.createEmptyBorder(12, 12, 12, 12)));
+
             }
+
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                btn.setBackground(new Color(52, 73, 94));
+                btn.setBackground(new Color(50, 50, 50));
+                btn.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(new Color(80, 80, 80)),
+                        BorderFactory.createEmptyBorder(12, 12, 12, 12)));
+
             }
         });
 
@@ -143,7 +155,7 @@ public class Window {
     }
 
     private void handleButtonAction(String command) {
-        switch(command) {
+        switch (command) {
             case "CONNECT":
                 circuit.enableConnectingMode();
                 break;
@@ -152,42 +164,43 @@ public class Window {
                 break;
             default:
                 // Utiliser directement la commande comme type
-                circuit.enableAddingComponent(command.toUpperCase()); 
+                circuit.enableAddingComponent(command.toUpperCase());
                 break;
         }
     }
+
     private JMenuBar createSimulationMenuBar() {
         JMenuBar menuBar = new JMenuBar();
-        menuBar.setBackground(Color.WHITE);
+        menuBar.setBackground(new Color(250, 250, 250));
         menuBar.setLayout(new BoxLayout(menuBar, BoxLayout.X_AXIS));
-        menuBar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(200, 200, 200)));
-    
+        menuBar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(220, 220, 220)));
+
         // Contrôles de simulation centrés
         JPanel centerPanel = new JPanel();
         centerPanel.setBackground(Color.GREEN);
         centerPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 2));
-        
+
         JButton startButton = createToolButton("▶", "Démarrer (Space)");
         JButton pauseButton = createToolButton("⏸", "Pause (P)");
         JButton resetButton = createToolButton("↺", "Réinitialiser (R)");
-        
+
         centerPanel.add(startButton);
         centerPanel.add(pauseButton);
         centerPanel.add(resetButton);
-    
+
         // Sélecteur de vitesse compact à droite
         JPanel rightPanel = new JPanel();
         rightPanel.setBackground(Color.GREEN);
         rightPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 2));
-        
-        JComboBox<String> speedSelector = new JComboBox<>(new String[]{"1x", "2x", "5x", "Max"});
-        speedSelector.setPrototypeDisplayValue("1x");  // Réduit la largeur
+
+        JComboBox<String> speedSelector = new JComboBox<>(new String[] { "1x", "2x", "5x", "Max" });
+        speedSelector.setPrototypeDisplayValue("1x"); // Réduit la largeur
         speedSelector.setMaximumSize(new Dimension(60, 25));
         speedSelector.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        
+
         JLabel clockLabel = new JLabel("Horloge: 0");
         JLabel statusLabel = new JLabel("Statut: Arrêté");
-    
+
         // Assemblage final
         menuBar.add(Box.createHorizontalGlue());
         menuBar.add(centerPanel);
@@ -199,26 +212,37 @@ public class Window {
         rightPanel.add(Box.createHorizontalStrut(5));
         rightPanel.add(statusLabel);
         menuBar.add(rightPanel);
-    
+
         return menuBar;
     }
+
     private JButton createToolButton(String iconText, String tooltip) {
-    JButton btn = new JButton(iconText);
-    btn.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-    btn.setToolTipText(tooltip);
-    btn.setBackground(Color.WHITE);
-    btn.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-    
-    // Style hover
-    btn.addMouseListener(new MouseAdapter() {
-        public void mouseEntered(MouseEvent e) {
-            btn.setBackground(new Color(240, 240, 240));
-        }
-        public void mouseExited(MouseEvent e) {
-            btn.setBackground(Color.WHITE);
-        }
-    });
-    
-    return btn;
-}
+        JButton btn = new JButton(iconText);
+        btn.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        btn.setToolTipText(tooltip);
+        btn.setBackground(Color.WHITE);
+        btn.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(200, 200, 200)),
+                BorderFactory.createEmptyBorder(4, 12, 4, 12)));
+
+        // Style hover
+        btn.addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent e) {
+                btn.setBackground(new Color(246, 246, 246));
+                btn.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(new Color(180, 180, 180)),
+                        BorderFactory.createEmptyBorder(4, 12, 4, 12)));
+
+            }
+
+            public void mouseExited(MouseEvent e) {
+                btn.setBackground(Color.WHITE);
+                btn.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(new Color(200, 200, 200)),
+                        BorderFactory.createEmptyBorder(4, 12, 4, 12)));
+            }
+        });
+
+        return btn;
+    }
 }
