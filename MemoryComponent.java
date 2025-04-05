@@ -1,9 +1,8 @@
 import java.awt.*;
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
-import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
 
-public class MemoryComponent {
+public abstract class MemoryComponent {
     private int id;
     private String type;
     private int x, y;
@@ -11,7 +10,8 @@ public class MemoryComponent {
     private final int WIDTH = 80;
     private final int HEIGHT = 60;
     private int rotationAngle = 0;
-    private Image image;
+    protected List<ConnectionPoint> inputs = new ArrayList<>();
+    protected List<ConnectionPoint> outputs = new ArrayList<>();
 
     public MemoryComponent(int id, String type, int x, int y) {
         this.id = id;
@@ -19,7 +19,6 @@ public class MemoryComponent {
         this.x = x - WIDTH / 2; // Centrage sur le point de clic
         this.y = y - HEIGHT / 2;
         this.isVisited = false;
-        this.image = loadImage();
     }
 
     // Méthodes d'accès
@@ -31,19 +30,48 @@ public class MemoryComponent {
     public int getCenterY() { return y + HEIGHT / 2; }
     public void setVisited(boolean visited) { this.isVisited = visited; }
     public boolean isVisited() { return isVisited; }
+    protected int getRotationAngle() { return rotationAngle; }
+    protected int getWidth() { return WIDTH; }
+    protected int getHeight() { return HEIGHT; }
+    public List<ConnectionPoint> getInputs() { return inputs; }
+    public List<ConnectionPoint> getOutputs() { return outputs; }
+    public List<ConnectionPoint> getAllConnectionPoints() {
+        List<ConnectionPoint> allPoints = new ArrayList<>(inputs);
+        allPoints.addAll(outputs);
+        return allPoints;
+    }
 
-    /* Déplacement du composant 
+
+    protected void setX(int x) { this.x = x; }
+    protected void setY(int y) { this.y = y; }
+    protected void setRotationAngle(int angle) { this.rotationAngle = angle; }
+
+
+    /*  Déplacement du composant 
     public void move(int dx, int dy) {
         x += dx;
         y += dy;
     }
     */
     
-
+    
     // Centrer le composant sur la position de la souris
-    public void moveTo(int x, int y) {
-        this.x = x - WIDTH / 2;
-        this.y = y - HEIGHT / 2;
+    public void moveTo(int newX, int newY) {
+        // Calcul du déplacement
+        int dx = newX - (x + WIDTH/2);
+        int dy = newY - (y + HEIGHT/2);
+        
+        // Mise à jour position
+        x = newX - WIDTH/2;
+        y = newY - HEIGHT/2;
+        
+        // Mise à jour des points
+        for (ConnectionPoint point : inputs) {
+            point.move(dx, dy);
+        }
+        for (ConnectionPoint point : outputs) {
+            point.move(dx, dy);
+        }
     }
 
     // Vérification du clic
@@ -56,62 +84,62 @@ public class MemoryComponent {
     public void rotate() {
         rotationAngle = (rotationAngle + 90) % 360;
     }
+    public abstract void draw(Graphics g, boolean isSelected);
 
-    // Dessin du composant avec image
-    public void draw(Graphics g, boolean isSelected) {
-        Graphics2D g2d = (Graphics2D) g;
-        AffineTransform originalTransform = g2d.getTransform();
-    
-        // Rotation
-        g2d.rotate(Math.toRadians(rotationAngle), x + WIDTH / 2.0, y + HEIGHT / 2.0);
-    
-        // Dessin de l'image
-        g2d.drawImage(image, x, y, null);
-    
-        // Bordure de sélection
-        if (isSelected) {
-            g2d.setColor(Color.RED);
-            g2d.setStroke(new BasicStroke(2));
-            g2d.drawRect(x, y, WIDTH, HEIGHT);
+    protected void drawConnectionPoints(Graphics2D g2d) {
+        for (ConnectionPoint point : inputs) {
+            point.draw(g2d, Color.RED); // Entrées en rouge
         }
-    
-        g2d.setTransform(originalTransform);
-    }
-
-    // Chargement de l'image
-    private Image loadImage() {
-        try {
-            // Chemin absolu depuis la racine des ressources
-            String imagePath = "/img/" + this.type.toLowerCase() + ".png";
-            System.out.println("Trying to load: " + imagePath); // Debug
-            
-            ImageIcon icon = new ImageIcon(getClass().getResource(imagePath));
-            if (icon.getImage() == null) throw new Exception();
-            
-            return icon.getImage().getScaledInstance(WIDTH, HEIGHT, Image.SCALE_SMOOTH);
-        } catch (Exception e) {
-            System.err.println("ERREUR: Image non trouvée pour " + type);
-            return createFallbackImage();
+        for (ConnectionPoint point : outputs) {
+            point.draw(g2d, Color.GREEN); // Sorties en vert
         }
     }
 
-    // Image de secours
-    private BufferedImage createFallbackImage() {
-        BufferedImage img = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2d = img.createGraphics();
+    public ConnectionPoint getConnectionPointAt(int px, int py) {
+        for (ConnectionPoint point : inputs) {
+            if (point.contains(px, py)) return point;
+        }
+        for (ConnectionPoint point : outputs) {
+            if (point.contains(px, py)) return point;
+        }
+        return null;
+    }
+
+    public void updateConnectionPoints() {
+        for (ConnectionPoint point : inputs) {
+            point.updatePosition(
+                x + (point.isInput() ? 0 : WIDTH),
+                y + HEIGHT/3 // Ajustez selon le point
+            );
+        }
+        for (ConnectionPoint point : outputs) {
+            point.updatePosition(
+                x + (point.isInput() ? 0 : WIDTH),
+                y + HEIGHT/2
+            );
+        }
+    }
+
+    protected void initConnectionPoints() {
+        // Ne pas clear() les listes - conserve les références existantes
         
-        // Fond semi-transparent
-        g2d.setColor(new Color(255, 0, 0, 100));
-        g2d.fillRect(0, 0, WIDTH, HEIGHT);
+        if (inputs.isEmpty()) {
+            inputs.add(new ConnectionPoint(this, x, y + HEIGHT/3, true));
+            inputs.add(new ConnectionPoint(this, x, y + 2*HEIGHT/3, true));
+        } else {
+            inputs.get(0).updatePosition(x, y + HEIGHT/3);
+            inputs.get(1).updatePosition(x, y + 2*HEIGHT/3);
+        }
         
-        // Texte d'erreur
-        g2d.setColor(Color.BLACK);
-        g2d.setFont(new Font("Arial", Font.BOLD, 10));
-        String text = "Image manquante";
-        int textWidth = g2d.getFontMetrics().stringWidth(text);
-        g2d.drawString(text, (WIDTH - textWidth)/2, HEIGHT/2);
-        
-        g2d.dispose();
-        return img;
+        if (outputs.isEmpty()) {
+            outputs.add(new ConnectionPoint(this, x + WIDTH, y + HEIGHT/2, false));
+        } else {
+            outputs.get(0).updatePosition(x + WIDTH, y + HEIGHT/2);
+        }
+    }
+
+    public boolean isConnectedTo(Wire wire) {
+        // Vérifie si le fil est connecté à une entrée ou sortie de ce composant
+        return inputs.contains(wire.getEnd()) || outputs.contains(wire.getStart());
     }
 }   
