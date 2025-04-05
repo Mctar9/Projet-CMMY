@@ -3,8 +3,7 @@ import java.awt.*;
 import javax.swing.border.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.ActionEvent;
-import org.w3c.dom.events.MouseEvent;
-
+import java.awt.event.MouseEvent;
 public class Window {
     private JFrame frame;
     private Circuit circuit;
@@ -20,7 +19,6 @@ public class Window {
         splitPane.setDividerLocation(200); // Largeur augmentée pour les images
 
         frame.getContentPane().setBackground(Color.WHITE); // zone princupal en fond blanc
-        frame = new JFrame("Logic Circuit Designer");
         frame.setJMenuBar(createSimulationMenuBar()); // Ajout de la barre de menu
 
         circuit = new Circuit();
@@ -218,7 +216,7 @@ public class Window {
 
     private JButton createToolButton(String iconText, String tooltip) {
         JButton btn = new JButton(iconText);
-        btn.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        btn.setFont(new Font("Arial Unicode MS", Font.PLAIN, 16)); // Taille de police augmentée
         btn.setToolTipText(tooltip);
         btn.setBackground(Color.WHITE);
         btn.setBorder(BorderFactory.createCompoundBorder(

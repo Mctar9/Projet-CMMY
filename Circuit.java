@@ -1,7 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,13 +8,12 @@ public class Circuit extends JPanel {
     private List<MemoryComponent> components = new ArrayList<>();
     private List<Wire> wires = new ArrayList<>();
     private MemoryComponent selectedComponent = null;
-    private MemoryComponent firstSelectedForWire = null;
 
     // États des modes
     private boolean addingComponent = false;
     private boolean connectingMode = false;
     private boolean deletingMode = false;
-
+    private ConnectionPoint firstSelectedPoint = null;
     private String addingComponentType;
 
     public Circuit() {
@@ -84,35 +82,86 @@ public class Circuit extends JPanel {
     private void deleteComponentOrWire(MouseEvent e) {
         MemoryComponent component = getComponent(e.getX(), e.getY());
         if (component != null) {
+            // Créer une copie pour éviter ConcurrentModificationException
+            List<Wire> wiresToRemove = new ArrayList<>();
+            
+            for (Wire wire : wires) {
+                // Vérifier toutes les entrées du composant
+                for (ConnectionPoint input : component.getInputs()) {
+                    if (input.equals(wire.getEnd())) {
+                        wiresToRemove.add(wire);
+                        break;
+                    }
+                }
+                // Vérifier toutes les sorties du composant
+                for (ConnectionPoint output : component.getOutputs()) {
+                    if (output.equals(wire.getStart())) {
+                        wiresToRemove.add(wire);
+                        break;
+                    }
+                }
+            }
+            
+            wires.removeAll(wiresToRemove);
             components.remove(component);
-            wires.removeIf(wire -> wire.getStart() == component || wire.getEnd() == component);
         } else {
             Wire wire = getWireAt(e.getX(), e.getY());
-            if (wire != null) {
-                wires.remove(wire);
-            }
+            if (wire != null) wires.remove(wire);
         }
+        repaint();
     }
 
     private void addNewComponent(MouseEvent e) {
-        components.add(new MemoryComponent(
-                components.size() + 1,
-                addingComponentType,
-                e.getX(), // Le centrage est géré dans le constructeur de MemoryComponent
-                e.getY()));
+        switch (addingComponentType) {
+            case "AND":
+                components.add(new AndGate(components.size() + 1, e.getX(), e.getY()));
+                break;
+            case "OR":
+                components.add(new OrGate(components.size() + 1, e.getX(), e.getY()));
+                break;
+            case "NOT":
+                components.add(new NotGate(components.size() + 1, e.getX(), e.getY()));
+                break;
+        }
     }
 
     private void handleWireConnection(MouseEvent e) {
-        MemoryComponent clickedComponent = getComponent(e.getX(), e.getY());
-        if (clickedComponent != null) {
-            if (firstSelectedForWire == null) {
-                firstSelectedForWire = clickedComponent;
-            } else {
-                wires.add(new Wire(firstSelectedForWire, clickedComponent));
-                firstSelectedForWire = null;
-                connectingMode = false;
+        ConnectionPoint clickedPoint = findConnectionPoint(e.getX(), e.getY());
+        
+        if (clickedPoint == null) {
+            firstSelectedPoint = null; // Annule la sélection si on clique ailleurs
+            repaint();
+            return;
+        }
+
+        if (firstSelectedPoint == null) {
+            // Premier point sélectionné (doit être une sortie)
+            if (!clickedPoint.isInput()) {
+                firstSelectedPoint = clickedPoint;
+            }
+        } else {
+            // Deuxième point sélectionné (doit être une entrée)
+            if (clickedPoint.isInput()) {
+                // Vérifie qu'on ne connecte pas à soi-même
+                if (!firstSelectedPoint.getParentComponent().equals(clickedPoint.getParentComponent())) {
+                    wires.add(new Wire(firstSelectedPoint, clickedPoint));
+                }
+            }
+            firstSelectedPoint = null;
+        }
+        repaint();
+    }
+
+    private ConnectionPoint findConnectionPoint(int x, int y) {
+        for (MemoryComponent comp : components) {
+            for (ConnectionPoint point : comp.getInputs()) {
+                if (point.contains(x, y)) return point;
+            }
+            for (ConnectionPoint point : comp.getOutputs()) {
+                if (point.contains(x, y)) return point;
             }
         }
+        return null;
     }
 
     private void selectComponent(MouseEvent e) {
@@ -121,7 +170,6 @@ public class Circuit extends JPanel {
 
     private void handleKeyPress(KeyEvent e) {
         if (selectedComponent != null) {
-            int moveStep = 10; // Pas de déplacement réduit pour plus de précision
             switch (e.getKeyCode()) {
 
                 /*
@@ -171,7 +219,6 @@ public class Circuit extends JPanel {
 
     public void enableConnectingMode() {
         connectingMode = true;
-        firstSelectedForWire = null;
     }
 
     public void enableDeletingMode() {

@@ -1,21 +1,26 @@
-import java.util.ArrayList;
-import java.util.List;
 import java.awt.*;
 import java.awt.geom.Line2D;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Wire {
     private String value;
-    private List<MemoryComponent> connections;
-    private MemoryComponent start;
-    private MemoryComponent end;
-    
-    public Wire(MemoryComponent start, MemoryComponent end) {
+    private List<ConnectionPoint> connections;
+    private ConnectionPoint start;
+    private ConnectionPoint end;
+
+    public Wire(ConnectionPoint start, ConnectionPoint end) {
         this.value = "undefined";
         this.connections = new ArrayList<>();
         this.start = start;
         this.end = end;
         connections.add(start);
         connections.add(end);
+        
+        // Validation de la connexion
+        if (start.isInput() || !end.isInput()) {
+            throw new IllegalArgumentException("Un fil doit connecter une sortie (output) à une entrée (input)");
+        }
     }
 
     public String getValue() {
@@ -26,53 +31,79 @@ public class Wire {
         this.value = value;
     }
 
-    public void addConnection(MemoryComponent component) {
-        if (!connections.contains(component)) {
-            connections.add(component);
+    public void addConnection(ConnectionPoint point) {
+        if (!connections.contains(point)) {
+            connections.add(point);
         }
     }
 
-    public List<MemoryComponent> getConnections() {
+    public List<ConnectionPoint> getConnections() {
         return new ArrayList<>(connections);
     }
 
-    public MemoryComponent getStart() {
+    public ConnectionPoint getStart() {
         return start;
     }
 
-    public MemoryComponent getEnd() {
+    public ConnectionPoint getEnd() {
         return end;
     }
 
-    public void setStart(MemoryComponent start) {
-        this.start = start;
-        if (!connections.contains(start)) {
-            connections.add(start);
+    public void setStart(ConnectionPoint start) {
+        if (!start.isInput()) { // Doit être une sortie
+            this.start = start;
+            if (!connections.contains(start)) {
+                connections.add(start);
+            }
         }
     }
 
-    public void setEnd(MemoryComponent end) {
-        this.end = end;
-        if (!connections.contains(end)) {
-            connections.add(end);
+    public void setEnd(ConnectionPoint end) {
+        if (end.isInput()) { // Doit être une entrée
+            this.end = end;
+            if (!connections.contains(end)) {
+                connections.add(end);
+            }
         }
     }
 
-//--------------INTERFACE GRAPHIQUE--------------//
+    //-------------- INTERFACE GRAPHIQUE --------------//
 
     public void draw(Graphics g) {
-        g.setColor(Color.BLACK);
-        g.drawLine(
-            start.getCenterX(), start.getCenterY(),
-            end.getCenterX(), end.getCenterY()
-        );
+        Graphics2D g2d = (Graphics2D) g;
+        
+        // Dessin de la ligne principale
+        g2d.setStroke(new BasicStroke(3));
+        g2d.setColor(Color.BLUE);
+        g2d.drawLine(start.getX(), start.getY(), end.getX(), end.getY());
+        
+        // Cercles aux extrémités
+        g2d.setColor(Color.CYAN);
+        g2d.fillOval(start.getX() - 3, start.getY() - 3, 6, 6);
+        g2d.fillOval(end.getX() - 3, end.getY() - 3, 6, 6);
     }
     
     public boolean isPointOnWire(int x, int y, int tolerance) {
         return Line2D.ptSegDist(
-            start.getCenterX(), start.getCenterY(),
-            end.getCenterX(), end.getCenterY(),
+            start.getX(), start.getY(),
+            end.getX(), end.getY(),
             x, y
         ) < tolerance;
+    }
+    
+    // Nouvelle méthode pour mettre à jour la position lors des déplacements
+    public void updatePosition() {
+        // Les ConnectionPoints sont mis à jour automatiquement via MemoryComponent
+    }
+
+    public boolean isConnectedTo(MemoryComponent comp) {
+        // Vérifie si le fil est connecté à ce composant
+        for (ConnectionPoint input : comp.getInputs()) {
+            if (input.equals(end)) return true;
+        }
+        for (ConnectionPoint output : comp.getOutputs()) {
+            if (output.equals(start)) return true;
+        }
+        return false;
     }
 }
