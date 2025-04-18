@@ -128,8 +128,9 @@ public class Circuit extends JPanel {
     private void handleWireConnection(MouseEvent e) {
         ConnectionPoint clickedPoint = findConnectionPoint(e.getX(), e.getY());
         
+        // Annule la sélection si on clique ailleurs
         if (clickedPoint == null) {
-            firstSelectedPoint = null; // Annule la sélection si on clique ailleurs
+            firstSelectedPoint = null; 
             repaint();
             return;
         }

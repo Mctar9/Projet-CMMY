@@ -4,6 +4,7 @@ import javax.swing.border.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
+
 public class Window {
     private JFrame frame;
     private Circuit circuit;
@@ -12,14 +13,13 @@ public class Window {
         frame = new JFrame("Logic Circuit Designer");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(1200, 800);
+        frame.getContentPane().setBackground(Color.WHITE); // zone princupal en fond blanc
+        frame.setJMenuBar(createSimulationMenuBar()); // Ajout de la barre de menu
 
         // Configuration du layout principal
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setDividerSize(3);
         splitPane.setDividerLocation(200); // Largeur augmentée pour les images
-
-        frame.getContentPane().setBackground(Color.WHITE); // zone princupal en fond blanc
-        frame.setJMenuBar(createSimulationMenuBar()); // Ajout de la barre de menu
 
         circuit = new Circuit();
         JPanel sidebar = createSidebar();
@@ -50,7 +50,7 @@ public class Window {
     private JPanel createSidebar() {
         JPanel sidebar = new JPanel();
         sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
-        sidebar.setBackground(new Color(44, 62, 80));
+        sidebar.setBackground(new Color(26, 42, 84));
         sidebar.setBorder(new EmptyBorder(10, 10, 10, 10));
 
         // Section Portes Logiques
@@ -100,7 +100,7 @@ public class Window {
 
         // Boutons avec images
         for (String[] item : items) {
-            JButton btn = createImageButton(item[0], item[1]);
+            JButton btn = createButton(item[0], item[1]);
             btn.addActionListener(e -> handleButtonAction(item[0])); // Envoyer le type directement
             section.add(btn);
             section.add(Box.createVerticalStrut(8));
@@ -110,25 +110,17 @@ public class Window {
         parent.add(Box.createVerticalStrut(20));
     }
 
-    private JButton createImageButton(String type, String tooltip) {
+    private JButton createButton(String type, String tooltip) {
         JButton btn = new JButton();
         btn.setToolTipText(tooltip);
         btn.setBackground(new Color(50, 50, 50));
         btn.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         btn.setPreferredSize(new Dimension(120, 80));
 
-        try {
-            // Chargement de l'image
-            String imagePath = "PROJET-CMMY/img/and.png";
-            ImageIcon icon = new ImageIcon(getClass().getResource(imagePath));
-            Image scaled = icon.getImage().getScaledInstance(60, 40, Image.SCALE_SMOOTH);
-            btn.setIcon(new ImageIcon(scaled));
-        } catch (Exception e) {
-            // Fallback textuel
-            btn.setText(type);
-            btn.setForeground(Color.WHITE);
-            btn.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        }
+        // Fallback textuel
+        btn.setText(type);
+        btn.setForeground(Color.WHITE);
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 12));
 
         // Effet hover
         btn.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -169,13 +161,13 @@ public class Window {
 
     private JMenuBar createSimulationMenuBar() {
         JMenuBar menuBar = new JMenuBar();
-        menuBar.setBackground(new Color(250, 250, 250));
+        menuBar.setBackground(new Color(26, 42, 84));
         menuBar.setLayout(new BoxLayout(menuBar, BoxLayout.X_AXIS));
         menuBar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(220, 220, 220)));
 
         // Contrôles de simulation centrés
         JPanel centerPanel = new JPanel();
-        centerPanel.setBackground(Color.GREEN);
+        centerPanel.setBackground(new Color(26, 42, 84));
         centerPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 2));
 
         JButton startButton = createToolButton("▶", "Démarrer (Space)");
@@ -188,22 +180,27 @@ public class Window {
 
         // Sélecteur de vitesse compact à droite
         JPanel rightPanel = new JPanel();
-        rightPanel.setBackground(Color.GREEN);
+        rightPanel.setBackground(new Color(26, 42, 84));
         rightPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 2));
 
         JComboBox<String> speedSelector = new JComboBox<>(new String[] { "1x", "2x", "5x", "Max" });
         speedSelector.setPrototypeDisplayValue("1x"); // Réduit la largeur
         speedSelector.setMaximumSize(new Dimension(60, 25));
         speedSelector.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        
 
         JLabel clockLabel = new JLabel("Horloge: 0");
+        clockLabel.setForeground(Color.white);
         JLabel statusLabel = new JLabel("Statut: Arrêté");
+        statusLabel.setForeground(Color.white);
+        JLabel vitesse = new JLabel("Vitesse:");
+        vitesse.setForeground(Color.white);
 
         // Assemblage final
         menuBar.add(Box.createHorizontalGlue());
         menuBar.add(centerPanel);
         menuBar.add(Box.createHorizontalGlue());
-        rightPanel.add(new JLabel("Vitesse:"));
+        rightPanel.add(vitesse);
         rightPanel.add(speedSelector);
         rightPanel.add(Box.createHorizontalStrut(15));
         rightPanel.add(clockLabel);
@@ -216,7 +213,7 @@ public class Window {
 
     private JButton createToolButton(String iconText, String tooltip) {
         JButton btn = new JButton(iconText);
-        btn.setFont(new Font("Arial Unicode MS", Font.PLAIN, 16)); // Taille de police augmentée
+        btn.setFont(new Font("Arial Unicode MS", Font.PLAIN, 15)); // Taille de police augmentée
         btn.setToolTipText(tooltip);
         btn.setBackground(Color.WHITE);
         btn.setBorder(BorderFactory.createCompoundBorder(

@@ -121,7 +121,6 @@ public abstract class MemoryComponent {
     }
 
     protected void initConnectionPoints() {
-        // Ne pas clear() les listes - conserve les références existantes
         
         if (inputs.isEmpty()) {
             inputs.add(new ConnectionPoint(this, x, y + HEIGHT/3, true));
