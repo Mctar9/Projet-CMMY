@@ -4,10 +4,15 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Représente le panneau principal du circuit logique.
+ * Gère les composants, les fils, les interactions souris et clavier,
+ * ainsi que les différents modes (ajout, suppression, connexion).
+ */
 public class Circuit extends JPanel {
-    private List<MemoryComponent> components = new ArrayList<>();
-    private List<Wire> wires = new ArrayList<>();
-    private MemoryComponent selectedComponent = null;
+    private List<MemoryComponent> components = new ArrayList<>(); //liste des composants
+    private List<Wire> wires = new ArrayList<>(); //liste des fils
+    private MemoryComponent selectedComponent = null; // composant sélectionné
 
     // États des modes
     private boolean addingComponent = false;
@@ -16,6 +21,10 @@ public class Circuit extends JPanel {
     private ConnectionPoint firstSelectedPoint = null;
     private String addingComponentType;
 
+    /**
+     * Initialise le circuit avec les gestionnaires d'événements nécessaires
+     * pour les interactions utilisateur (clavier, souris, glisser-déposer).
+     */
     public Circuit() {
         setBackground(new Color(255, 255, 255));
         setFocusable(true);
@@ -38,17 +47,18 @@ public class Circuit extends JPanel {
                 repaint();
             }
         });
+
         // Gestion du drag-and-drop
         addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
                 if (selectedComponent != null) {
-                    // Déplacer le composant sélectionné
                     selectedComponent.moveTo(e.getX(), e.getY());
                     repaint();
                 }
             }
         });
+
         // Gestion du clic pour sélectionner un composant
         addMouseListener(new MouseAdapter() {
             @Override
@@ -58,11 +68,15 @@ public class Circuit extends JPanel {
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                selectedComponent = null; // Désélectionner après le déplacement
+                selectedComponent = null;
             }
         });
     }
 
+    /**
+     * Gère les clics de souris selon le mode actif (ajout, suppression, etc).
+     * @param e Événement de souris
+     */
     private void handleMouseClick(MouseEvent e) {
         requestFocusInWindow();
 
@@ -79,21 +93,21 @@ public class Circuit extends JPanel {
         }
     }
 
+    /**
+     * Supprime un composant ou un fil situé à l'endroit du clic.
+     * @param e Événement de souris
+     */
     private void deleteComponentOrWire(MouseEvent e) {
         MemoryComponent component = getComponent(e.getX(), e.getY());
         if (component != null) {
-            // Créer une copie pour éviter ConcurrentModificationException
             List<Wire> wiresToRemove = new ArrayList<>();
-            
             for (Wire wire : wires) {
-                // Vérifier toutes les entrées du composant
                 for (ConnectionPoint input : component.getInputs()) {
                     if (input.equals(wire.getEnd())) {
                         wiresToRemove.add(wire);
                         break;
                     }
                 }
-                // Vérifier toutes les sorties du composant
                 for (ConnectionPoint output : component.getOutputs()) {
                     if (output.equals(wire.getStart())) {
                         wiresToRemove.add(wire);
@@ -101,7 +115,6 @@ public class Circuit extends JPanel {
                     }
                 }
             }
-            
             wires.removeAll(wiresToRemove);
             components.remove(component);
         } else {
@@ -111,6 +124,10 @@ public class Circuit extends JPanel {
         repaint();
     }
 
+    /**
+     * Ajoute un nouveau composant logique au circuit à l'endroit du clic.
+     * @param e Événement de souris
+     */
     private void addNewComponent(MouseEvent e) {
         switch (addingComponentType) {
             case "AND":
@@ -125,10 +142,13 @@ public class Circuit extends JPanel {
         }
     }
 
+    /**
+     * Gère la connexion de deux points de connexion via un fil.
+     * @param e Événement de souris
+     */
     private void handleWireConnection(MouseEvent e) {
         ConnectionPoint clickedPoint = findConnectionPoint(e.getX(), e.getY());
-        
-        // Annule la sélection si on clique ailleurs
+
         if (clickedPoint == null) {
             firstSelectedPoint = null; 
             repaint();
@@ -136,14 +156,11 @@ public class Circuit extends JPanel {
         }
 
         if (firstSelectedPoint == null) {
-            // Premier point sélectionné (doit être une sortie)
             if (!clickedPoint.isInput()) {
                 firstSelectedPoint = clickedPoint;
             }
         } else {
-            // Deuxième point sélectionné (doit être une entrée)
             if (clickedPoint.isInput()) {
-                // Vérifie qu'on ne connecte pas à soi-même
                 if (!firstSelectedPoint.getParentComponent().equals(clickedPoint.getParentComponent())) {
                     wires.add(new Wire(firstSelectedPoint, clickedPoint));
                 }
@@ -153,6 +170,12 @@ public class Circuit extends JPanel {
         repaint();
     }
 
+    /**
+     * Recherche un point de connexion présent à une position donnée.
+     * @param x Coordonnée X
+     * @param y Coordonnée Y
+     * @return Le point de connexion trouvé, ou null si aucun
+     */
     private ConnectionPoint findConnectionPoint(int x, int y) {
         for (MemoryComponent comp : components) {
             for (ConnectionPoint point : comp.getInputs()) {
@@ -165,38 +188,33 @@ public class Circuit extends JPanel {
         return null;
     }
 
+    /**
+     * Sélectionne un composant sous le curseur de la souris.
+     * @param e Événement de souris
+     */
     private void selectComponent(MouseEvent e) {
         selectedComponent = getComponent(e.getX(), e.getY());
     }
 
+    /**
+     * Gère les interactions clavier (déplacement ou rotation de composants).
+     * @param e Événement clavier
+     */
     private void handleKeyPress(KeyEvent e) {
         if (selectedComponent != null) {
             switch (e.getKeyCode()) {
-
-                /*
-                 * case KeyEvent.VK_UP:
-                 * selectedComponent.move(0, -moveStep);
-                 * break;
-                 * case KeyEvent.VK_DOWN:
-                 * selectedComponent.move(0, moveStep);
-                 * break;
-                 * case KeyEvent.VK_LEFT:
-                 * selectedComponent.move(-moveStep, 0);
-                 * break;
-                 * case KeyEvent.VK_RIGHT:
-                 * selectedComponent.move(moveStep, 0);
-                 * break;
-                 * 
-                 * case KeyEvent.VK_R:
-                 * selectedComponent.rotate();
-                 * break;
-                 */
+                // déplacements / rotations désactivés ici
             }
         }
         repaint();
     }
 
-    // Méthodes d'accès aux composants
+    /**
+     * Récupère un composant situé à des coordonnées données.
+     * @param x Coordonnée X
+     * @param y Coordonnée Y
+     * @return Le composant trouvé ou null
+     */
     private MemoryComponent getComponent(int x, int y) {
         return components.stream()
                 .filter(c -> c.contains(x, y))
@@ -204,6 +222,12 @@ public class Circuit extends JPanel {
                 .orElse(null);
     }
 
+    /**
+     * Récupère un fil situé à proximité des coordonnées données.
+     * @param x Coordonnée X
+     * @param y Coordonnée Y
+     * @return Le fil trouvé ou null
+     */
     private Wire getWireAt(int x, int y) {
         final int TOLERANCE = 5;
         return wires.stream()
@@ -212,28 +236,37 @@ public class Circuit extends JPanel {
                 .orElse(null);
     }
 
-    // Gestion des modes
+    /**
+     * Active le mode d'ajout d'un composant spécifique.
+     * @param type Type de composant (ex: AND, OR, NOT)
+     */
     public void enableAddingComponent(String type) {
         addingComponent = true;
-        addingComponentType = type.toUpperCase(); // Uniformisation de la casse
+        addingComponentType = type.toUpperCase();
     }
 
+    /**
+     * Active le mode de connexion entre deux composants.
+     */
     public void enableConnectingMode() {
         connectingMode = true;
     }
 
+    /**
+     * Active le mode de suppression d'un composant ou d'un fil.
+     */
     public void enableDeletingMode() {
         deletingMode = true;
     }
 
+    /**
+     * Dessine tous les composants et les fils du circuit.
+     * @param g Contexte graphique
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-
-        // Dessiner les fils en premier
         wires.forEach(wire -> wire.draw(g));
-
-        // Dessiner les composants par-dessus
         components.forEach(comp -> comp.draw(g, comp == selectedComponent));
     }
 }
