@@ -5,10 +5,17 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 
+/**
+ * Main GUI window for the Logic Circuit Designer.
+ * Initializes the frame, sidebar, circuit area, and controls.
+ */
 public class Window {
-    private JFrame frame;
-    private Circuit circuit;
+    private JFrame frame; //fenetre principale
+    private Circuit circuit; //zone de dessin du circuit;
 
+    /**
+     * Constructs the main application window and initializes all components.
+     */
     public Window() {
         frame = new JFrame("Logic Circuit Designer");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -32,6 +39,9 @@ public class Window {
         setupShortcuts();
     }
 
+    /**
+     * Sets up keyboard shortcuts for the window (e.g., Ctrl+Q to quit).
+     */
     private void setupShortcuts() {
         AbstractAction closeAction = new AbstractAction() {
             @Override
@@ -47,6 +57,10 @@ public class Window {
 
     }
 
+    /**
+     * Creates the sidebar containing logic gate buttons and tools.
+     * @return JPanel representing the sidebar
+     */
     private JPanel createSidebar() {
         JPanel sidebar = new JPanel();
         sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
@@ -78,6 +92,12 @@ public class Window {
         return sidebar;
     }
 
+    /**
+     * Adds a section to the sidebar with labeled buttons.
+     * @param parent The container panel to which the section is added
+     * @param title The title label of the section
+     * @param items An array of item definitions (command, tooltip)
+     */
     private void addSection(JPanel parent, String title, String[][] items) {
         JPanel section = new JPanel();
         section.setLayout(new BoxLayout(section, BoxLayout.Y_AXIS));
@@ -110,6 +130,12 @@ public class Window {
         parent.add(Box.createVerticalStrut(20));
     }
 
+    /**
+     * Creates a stylized JButton with hover effects.
+     * @param type The command type or label
+     * @param tooltip Tooltip text shown on hover
+     * @return The configured JButton
+     */
     private JButton createButton(String type, String tooltip) {
         JButton btn = new JButton();
         btn.setToolTipText(tooltip);
@@ -144,6 +170,10 @@ public class Window {
         return btn;
     }
 
+    /**
+     * Handles the logic for each sidebar button based on its command.
+     * @param command The command string of the button (e.g., CONNECT, DELETE)
+     */
     private void handleButtonAction(String command) {
         switch (command) {
             case "CONNECT":
@@ -159,6 +189,10 @@ public class Window {
         }
     }
 
+    /**
+     * Creates the simulation menu bar with play, pause, reset buttons and clock status.
+     * @return The configured JMenuBar
+     */
     private JMenuBar createSimulationMenuBar() {
         JMenuBar menuBar = new JMenuBar();
         menuBar.setBackground(new Color(26, 42, 84));
@@ -211,6 +245,12 @@ public class Window {
         return menuBar;
     }
 
+    /**
+     * Creates a button for the menu bar with specific icon and tooltip.
+     * @param iconText The icon or text label of the button
+     * @param tooltip The tooltip text for the button
+     * @return The configured JButton
+     */
     private JButton createToolButton(String iconText, String tooltip) {
         JButton btn = new JButton(iconText);
         btn.setFont(new Font("Arial Unicode MS", Font.PLAIN, 15)); // Taille de police augmentée

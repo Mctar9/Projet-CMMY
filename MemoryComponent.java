@@ -2,21 +2,32 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Classe abstraite représentant un composant mémoire logique (porte logique, etc.).
+ * Contient la position, les entrées/sorties et les méthodes de dessin et déplacement.
+ */
 public abstract class MemoryComponent {
     private int id;
     private String type;
     private int x, y;
-    private boolean isVisited;
+    private boolean isVisited; // état de visite pour l'algorithme de parcours
     private final int WIDTH = 80;
     private final int HEIGHT = 60;
     private int rotationAngle = 0;
-    protected List<ConnectionPoint> inputs = new ArrayList<>();
-    protected List<ConnectionPoint> outputs = new ArrayList<>();
+    protected List<ConnectionPoint> inputs = new ArrayList<>(); //liste des points de connexion d'entrée
+    protected List<ConnectionPoint> outputs = new ArrayList<>(); //liste des points de connexion de sortie
 
+    /**
+     * Constructeur d'un composant mémoire centré sur les coordonnées données.
+     * @param id Identifiant du composant
+     * @param type Type de composant (AND, OR, etc.)
+     * @param x Coordonnée X du clic
+     * @param y Coordonnée Y du clic
+     */
     public MemoryComponent(int id, String type, int x, int y) {
         this.id = id;
         this.type = type;
-        this.x = x - WIDTH / 2; // Centrage sur le point de clic
+        this.x = x - WIDTH / 2;
         this.y = y - HEIGHT / 2;
         this.isVisited = false;
     }
@@ -35,37 +46,27 @@ public abstract class MemoryComponent {
     protected int getHeight() { return HEIGHT; }
     public List<ConnectionPoint> getInputs() { return inputs; }
     public List<ConnectionPoint> getOutputs() { return outputs; }
+
     public List<ConnectionPoint> getAllConnectionPoints() {
         List<ConnectionPoint> allPoints = new ArrayList<>(inputs);
         allPoints.addAll(outputs);
         return allPoints;
     }
 
-
     protected void setX(int x) { this.x = x; }
     protected void setY(int y) { this.y = y; }
     protected void setRotationAngle(int angle) { this.rotationAngle = angle; }
 
-
-    /*  Déplacement du composant 
-    public void move(int dx, int dy) {
-        x += dx;
-        y += dy;
-    }
-    */
-    
-    
-    // Centrer le composant sur la position de la souris
+    /**
+     * Déplace le composant en centrant sur la nouvelle position et met à jour les points de connexion.
+     * @param newX Nouvelle coordonnée X
+     * @param newY Nouvelle coordonnée Y
+     */
     public void moveTo(int newX, int newY) {
-        // Calcul du déplacement
         int dx = newX - (x + WIDTH/2);
         int dy = newY - (y + HEIGHT/2);
-        
-        // Mise à jour position
         x = newX - WIDTH/2;
         y = newY - HEIGHT/2;
-        
-        // Mise à jour des points
         for (ConnectionPoint point : inputs) {
             point.move(dx, dy);
         }
@@ -74,27 +75,50 @@ public abstract class MemoryComponent {
         }
     }
 
-    // Vérification du clic
+    /**
+     * Vérifie si un point (px, py) est à l'intérieur du composant.
+     * @param px Coordonnée X
+     * @param py Coordonnée Y
+     * @return true si le point est à l'intérieur
+     */
     public boolean contains(int px, int py) {
         return px >= x && px <= x + WIDTH && 
                py >= y && py <= y + HEIGHT;
     }
 
-    // Rotation
+    /**
+     * Applique une rotation de 90° au composant.
+     */
     public void rotate() {
         rotationAngle = (rotationAngle + 90) % 360;
     }
+
+    /**
+     * Méthode abstraite pour dessiner le composant.
+     * @param g Contexte graphique
+     * @param isSelected true si le composant est sélectionné
+     */
     public abstract void draw(Graphics g, boolean isSelected);
 
+    /**
+     * Dessine les points de connexion (rouge pour entrées, vert pour sorties).
+     * @param g2d Contexte graphique 2D
+     */
     protected void drawConnectionPoints(Graphics2D g2d) {
         for (ConnectionPoint point : inputs) {
-            point.draw(g2d, Color.RED); // Entrées en rouge
+            point.draw(g2d, Color.RED);
         }
         for (ConnectionPoint point : outputs) {
-            point.draw(g2d, Color.GREEN); // Sorties en vert
+            point.draw(g2d, Color.GREEN);
         }
     }
 
+    /**
+     * Renvoie un point de connexion situé à des coordonnées données.
+     * @param px Coordonnée X
+     * @param py Coordonnée Y
+     * @return Le point trouvé ou null
+     */
     public ConnectionPoint getConnectionPointAt(int px, int py) {
         for (ConnectionPoint point : inputs) {
             if (point.contains(px, py)) return point;
@@ -105,11 +129,14 @@ public abstract class MemoryComponent {
         return null;
     }
 
+    /**
+     * Met à jour la position des points de connexion en fonction de la position du composant.
+     */
     public void updateConnectionPoints() {
         for (ConnectionPoint point : inputs) {
             point.updatePosition(
                 x + (point.isInput() ? 0 : WIDTH),
-                y + HEIGHT/3 // Ajustez selon le point
+                y + HEIGHT/3
             );
         }
         for (ConnectionPoint point : outputs) {
@@ -120,8 +147,10 @@ public abstract class MemoryComponent {
         }
     }
 
+    /**
+     * Initialise ou met à jour les points de connexion du composant.
+     */
     protected void initConnectionPoints() {
-        
         if (inputs.isEmpty()) {
             inputs.add(new ConnectionPoint(this, x, y + HEIGHT/3, true));
             inputs.add(new ConnectionPoint(this, x, y + 2*HEIGHT/3, true));
@@ -129,7 +158,7 @@ public abstract class MemoryComponent {
             inputs.get(0).updatePosition(x, y + HEIGHT/3);
             inputs.get(1).updatePosition(x, y + 2*HEIGHT/3);
         }
-        
+
         if (outputs.isEmpty()) {
             outputs.add(new ConnectionPoint(this, x + WIDTH, y + HEIGHT/2, false));
         } else {
@@ -137,8 +166,12 @@ public abstract class MemoryComponent {
         }
     }
 
+    /**
+     * Vérifie si un fil est connecté à ce composant.
+     * @param wire Le fil à tester
+     * @return true si connecté à une entrée ou une sortie
+     */
     public boolean isConnectedTo(Wire wire) {
-        // Vérifie si le fil est connecté à une entrée ou sortie de ce composant
         return inputs.contains(wire.getEnd()) || outputs.contains(wire.getStart());
     }
-}   
+}
