@@ -132,15 +132,21 @@ public class Wire {
      */
     public void draw(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
-
         g2d.setStroke(new BasicStroke(3));
-        g2d.setColor(Color.BLUE);
+        switch (value) {
+            case "1":
+                g2d.setColor(new Color(152, 195, 121)); // Vert clair
+                break;
+            case "0":
+                g2d.setColor(new Color(224, 108, 117)); // Rouge clair
+                break;
+            default:
+                g2d.setColor(new Color(92, 99, 112)); // Gris bleu
+                break;
+        }
         g2d.drawLine(start.getX(), start.getY(), end.getX(), end.getY());
-
-        g2d.setColor(Color.CYAN);
-        g2d.fillOval(start.getX() - 3, start.getY() - 3, 6, 6);
-        g2d.fillOval(end.getX() - 3, end.getY() - 3, 6, 6);
     }
+    
 
     /**
      * Vérifie si un point (x, y) est proche du fil, avec une tolérance donnée.

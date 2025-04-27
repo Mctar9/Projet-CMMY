@@ -85,7 +85,6 @@ public class Window {
 
         // Section Outils
         addSection(sidebar, "OUTILS", new String[][] {
-                { "CONNECT", "Mode Connexion" },
                 { "DELETE", "Mode Suppression" }
         });
 
@@ -176,9 +175,6 @@ public class Window {
      */
     private void handleButtonAction(String command) {
         switch (command) {
-            case "CONNECT":
-                circuit.enableConnectingMode();
-                break;
             case "DELETE":
                 circuit.enableDeletingMode();
                 break;
