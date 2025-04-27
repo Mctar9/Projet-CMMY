@@ -114,6 +114,12 @@ public class Circuit extends JPanel {
             case "NOT":
                 components.add(new NotGate(components.size() + 1, e.getX(), e.getY()));
                 break;
+            case "XOR":
+                components.add(new XorGate(components.size() + 1, e.getX(), e.getY()));
+                break;
+            case "NAND":
+                components.add(new NandGate(components.size() + 1, e.getX(), e.getY()));
+                break;
         }
     }
 

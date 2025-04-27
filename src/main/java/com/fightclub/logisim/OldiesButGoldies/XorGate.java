@@ -8,4 +8,5 @@ public class XorGate extends MemoryComponent {
         initConnectionPoints();
     }
 
+
 }
