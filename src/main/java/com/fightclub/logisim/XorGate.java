@@ -36,22 +36,18 @@ public class XorGate extends MemoryComponent {
 
     // --------------méthodes--------------//
 
-    /**
-     * Initialise les points de connexion de la porte OR.
-     * Deux entrées et une sortie sont créées.
-     */
+
     @Override
     public void initConnectionPoints() {
-        inputs = new ArrayList<ConnectionPoint>(2);
-        outputs = new ArrayList<ConnectionPoint>(1);
+        inputs = new ArrayList<>(2);
+        outputs = new ArrayList<>(1);
 
         // Points de connexion d'entrée
-        inputs.add(new ConnectionPoint(this, 0, getHeight() / 2, true));
-        inputs.add(new ConnectionPoint(this, 0, getHeight() / 2 + 20, true));
+        inputs.add(new ConnectionPoint(this, getX(), getY() + getHeight() / 3, true));        // Première entrée (en haut à gauche)
+        inputs.add(new ConnectionPoint(this, getX(), getY() + 2 * getHeight() / 3, true));     // Deuxième entrée (en bas à gauche)
 
         // Point de connexion de sortie
-        outputs.add(new ConnectionPoint(this, getWidth(), getHeight() / 2 + 10, false));
-
+        outputs.add(new ConnectionPoint(this, getX() + getWidth(), getY() + getHeight() / 2, false)); // Sortie au milieu à droite
     }
 
     /**
@@ -76,8 +72,41 @@ public class XorGate extends MemoryComponent {
 
     @Override
     public void draw(Graphics g, boolean isSelected) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'draw'");
+        Graphics2D g2d = (Graphics2D) g;
+        AffineTransform oldTransform = g2d.getTransform();
+    
+        // Transformation pour rotation
+        g2d.translate(getX() + getWidth() / 2, getY() + getHeight() / 2);
+        g2d.rotate(Math.toRadians(getRotationAngle()));
+        g2d.translate(-getWidth() / 2, -getHeight() / 2);
+    
+        int width = 70; // largeur principale
+        int height = getHeight();
+        int extraOffset = 8; // décalage pour la 2e courbe de XOR
+    
+        // --- DESSIN ---
+        g2d.setColor(Color.LIGHT_GRAY);
+    
+        // Forme principale du XOR remplie
+        Path2D.Double path = new Path2D.Double();
+        path.moveTo(0, 0);
+        path.curveTo(width / 2.0, 0, width / 2.0, height, 0, height);
+        path.curveTo(width / 3.0, height, width - 10, height, width + 5, height / 2.0);
+        path.curveTo(width - 10, 0, width / 3.0, 0, 0, 0);
+        g2d.fill(path); // remplissage gris clair
+    
+        // Petite courbe supplémentaire du XOR
+        Path2D.Double extraCurve = new Path2D.Double();
+        extraCurve.moveTo(-extraOffset, 0);
+        extraCurve.curveTo(width / 2.0 - extraOffset, 0, width / 2.0 - extraOffset, height, -extraOffset, height);
+        g2d.draw(extraCurve);
+    
+        // --- TEXTE (facultatif) ---
+        g2d.setColor(Color.BLACK);
+        g2d.drawString("XOR", width / 3, height / 2 + 5);
+    
+        g2d.setTransform(oldTransform);
+        drawConnectionPoints(g2d);
+    
     }
-
 }

@@ -48,11 +48,12 @@ public class OrGate extends MemoryComponent {
         outputs = new ArrayList<ConnectionPoint>(1);
 
         // Points de connexion d'entrée
-        inputs.add(new ConnectionPoint(this, 0, getHeight() / 2, true));
-        inputs.add(new ConnectionPoint(this, 0, getHeight() / 2 + 20, true));
+        inputs.add(new ConnectionPoint(this, getX(), getY() + getHeight() / 3, true));        // Première entrée (en haut à gauche)
+        inputs.add(new ConnectionPoint(this, getX(), getY() + 2 * getHeight() / 3, true));     // Deuxième entrée (en bas à gauche)
 
         // Point de connexion de sortie
-        outputs.add(new ConnectionPoint(this, getWidth(), getHeight() / 2 + 10, false));
+        outputs.add(new ConnectionPoint(this, getX() + getWidth(), getY() + getHeight() / 2, false)); // Sortie au milieu à droite
+
 
     }
 
@@ -96,7 +97,7 @@ public class OrGate extends MemoryComponent {
 
         // Texte
         g2d.setColor(Color.BLACK);
-        g2d.drawString("OR", 15, getHeight() / 2 + 5);
+        g2d.drawString("OR", 10, getHeight() / 2 + 5);
 
         g2d.setTransform(oldTransform);
         drawConnectionPoints(g2d);

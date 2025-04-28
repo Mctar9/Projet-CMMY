@@ -13,5 +13,7 @@ public enum ComponentType {
     NAND,
     NOR,
     XOR,
-    XNOR;
+    XNOR,
+    HIGH,
+    LOW 
 }

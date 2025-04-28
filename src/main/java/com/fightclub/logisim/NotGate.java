@@ -44,16 +44,16 @@ public class NotGate extends MemoryComponent {
      */
     @Override
     public void initConnectionPoints() {
-        inputs = new ArrayList<ConnectionPoint>(1);
-        outputs = new ArrayList<ConnectionPoint>(1);
-
-        // Points de connexion d'entrée
-        inputs.add(new ConnectionPoint(this, 0, getHeight() / 2, true));
-
-        // Point de connexion de sortie
-        outputs.add(new ConnectionPoint(this, getWidth(), getHeight() / 2 + 10, false));
-
+        inputs = new ArrayList<>(1);
+        outputs = new ArrayList<>(1);
+    
+        // Point de connexion d'entrée (au milieu à gauche)
+        inputs.add(new ConnectionPoint(this, getX(), getY() + getHeight() / 2, true));
+    
+        // Point de connexion de sortie (au milieu à droite)
+        outputs.add(new ConnectionPoint(this, getX() + getWidth(), getY() + getHeight() / 2, false));
     }
+    
 
     /**
      * Retourne la valeur de sortie de la porte NOT.

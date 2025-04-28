@@ -167,6 +167,16 @@ public class Wire {
         g2d.drawLine(start.getX(), start.getY(), end.getX(), end.getY());
     }
 
+    // Méthode statique pour dessiner du texte centré
+    public static void drawString(Graphics g, String text, int x, int y, int width, int height) {
+        FontMetrics fm = g.getFontMetrics();
+        int textWidth = fm.stringWidth(text);
+        int textHeight = fm.getAscent();
+        int textX = x + (width - textWidth) / 2;
+        int textY = y + (height + textHeight) / 2 - 2; // Ajustement vertical
+        g.drawString(text, textX, textY);
+    }
+
     /**
      * Vérifie si un point (x, y) est proche du fil, avec une tolérance donnée.
      * 

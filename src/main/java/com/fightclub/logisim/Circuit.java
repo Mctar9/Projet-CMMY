@@ -42,6 +42,16 @@ public class Circuit extends JPanel {
         setFocusable(true);
         requestFocusInWindow();
 
+        components = new ArrayList<>();
+        wires = new ArrayList<>();
+
+        selectedComponent = null;
+        wireStartPoint = null;
+        currentMousePosition = null;
+        addingComponent = false;
+        deletingMode = false;
+
+
         // Gestion des clics souris
         addMouseListener(new MouseAdapter() {
             @Override
@@ -159,7 +169,14 @@ public class Circuit extends JPanel {
             case "NAND":
                 components.add(new NandGate(components.size() + 1, e.getX(), e.getY(), null, null));
                 break;
+            case "0":
+                components.add(new ConstantComponent(components.size() + 1,QuadBool.FALSE, e.getX(), e.getY()));
+                break;
+            case "1":
+                components.add(new ConstantComponent(components.size() + 1,QuadBool.TRUE, e.getX(), e.getY()));
+                break;
         }
+        repaint();
     }
 
 
@@ -222,7 +239,7 @@ public class Circuit extends JPanel {
      */
     public void enableAddingComponent(String type) {
         addingComponent = true;
-        addingComponentType = type.toUpperCase();
+        addingComponentType = type;
     }
 
     /**
@@ -270,6 +287,11 @@ public class Circuit extends JPanel {
      * @throws CircuitInstableException si aucun point fixe n'est trouvé après MAX_ITERATIONS
      */
     public void simuler() throws CircuitInstableException {
+
+        //petit test pour riadh pour tester que la methode simuler est lancé. CHECK IT BROO !!!!!!!!!!!!
+        this.setBackground(Color.BLACK);
+        
+
         // Étape 1: Initialisation
         for (Wire fil : wires) {
             fil.setValue(QuadBool.NOTHING); // Valeur initiale
@@ -299,19 +321,19 @@ public class Circuit extends JPanel {
      * 
      * @param fil le fil dont on veut calculer la valeur
      * @return la valeur QuadBool résultante (supremum des sorties connectées)
-     */
+     
     private QuadBool calculerValeurFil(Wire fil) {
         //Todo: Implémenter la logique de calcul
+    }*/
+
+        /**
+     * Exception levée lorsque le circuit n'atteint pas un état stable.
+     */
+    class CircuitInstableException extends Exception {
+        //Todo: Implémenter la logique d'exception
     }
-
-    /**
- * Exception levée lorsque le circuit n'atteint pas un état stable.
- */
-class CircuitInstableException extends Exception {
-    //Todo: Implémenter la logique d'exception
 }
 
-}
 
 
 

@@ -180,7 +180,7 @@ public class Window {
                 break;
             default:
                 // Utiliser directement la commande comme type
-                circuit.enableAddingComponent(command.toUpperCase());
+                circuit.enableAddingComponent(command);
                 break;
         }
     }
@@ -237,6 +237,27 @@ public class Window {
         rightPanel.add(Box.createHorizontalStrut(5));
         rightPanel.add(statusLabel);
         menuBar.add(rightPanel);
+
+        // Ajout des listeners
+        startButton.addActionListener(e -> {
+                try {
+                    circuit.simuler();
+                } catch (Circuit.CircuitInstableException e1) {
+                    JOptionPane.showMessageDialog(frame, "Circuit instable !", "Erreur", JOptionPane.ERROR_MESSAGE);
+                } // Lance la simulation
+                statusLabel.setText("Statut: En cours");
+            
+        });
+
+        pauseButton.addActionListener(e -> {
+            statusLabel.setText("Statut: En pause");
+            // À compléter avec la logique de pause
+        });
+
+        resetButton.addActionListener(e -> {
+            statusLabel.setText("Statut: Réinitialisé");
+            // À compléter avec la logique de reset 
+        });
 
         return menuBar;
     }
