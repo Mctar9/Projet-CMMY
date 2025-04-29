@@ -1,0 +1,80 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Wire Class</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; }
+        h1, h2, h3 { color: #2C3E50; }
+        code { background: #f4f4f4; padding: 2px 4px; }
+        .section { margin-bottom: 25px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+
+<h1>Wire Class</h1>
+<p><strong>public class Wire</strong></p>
+
+<p>Représente un fil reliant deux points dans un circuit logique. Le fil peut être connecté à plusieurs points intermédiaires, mais doit toujours relier une sortie à une entrée. Il gère aussi le dessin graphique du fil.</p>
+
+<h2>Package</h2>
+<p>(aucun package défini)</p>
+
+<h2>Class Overview</h2>
+<div class="section">
+    <p>La classe <code>Wire</code> modélise une connexion entre deux <code>ConnectionPoint</code> dans un circuit numérique :</p>
+    <ul>
+        <li>Peut contenir plusieurs connexions intermédiaires</li>
+        <li>Contient une valeur logique ("0", "1", "undefined")</li>
+        <li>Fournit des méthodes pour dessin graphique</li>
+        <li>Vérifie les connexions correctes : sortie → entrée</li>
+    </ul>
+</div>
+
+<h2>Field Summary</h2>
+<table>
+    <tr><th>Type</th><th>Nom</th><th>Description</th></tr>
+    <tr><td>String</td><td>value</td><td>Valeur logique transportée par le fil</td></tr>
+    <tr><td>List&lt;ConnectionPoint&gt;</td><td>connections</td><td>Points connectés au fil</td></tr>
+    <tr><td>ConnectionPoint</td><td>start</td><td>Point de départ (output)</td></tr>
+    <tr><td>ConnectionPoint</td><td>end</td><td>Point d'arrivée (input)</td></tr>
+</table>
+
+<h2>Constructor Summary</h2>
+<table>
+    <tr><th>Constructeur</th><th>Description</th></tr>
+    <tr>
+        <td><code>Wire(ConnectionPoint start, ConnectionPoint end)</code></td>
+        <td>Crée un nouveau fil entre deux points, en validant qu'on connecte une sortie vers une entrée.</td>
+    </tr>
+</table>
+
+<h2>Method Summary</h2>
+<table>
+    <tr><th>Signature</th><th>Description</th></tr>
+    <tr><td><code>String getValue()</code></td><td>Retourne la valeur logique du fil.</td></tr>
+    <tr><td><code>void setValue(String value)</code></td><td>Définit la valeur logique du fil.</td></tr>
+    <tr><td><code>void addConnection(ConnectionPoint point)</code></td><td>Ajoute une connexion au fil si elle n'existe pas déjà.</td></tr>
+    <tr><td><code>List&lt;ConnectionPoint&gt; getConnections()</code></td><td>Retourne toutes les connexions du fil.</td></tr>
+    <tr><td><code>ConnectionPoint getStart()</code></td><td>Retourne le point de départ (output).</td></tr>
+    <tr><td><code>ConnectionPoint getEnd()</code></td><td>Retourne le point d'arrivée (input).</td></tr>
+    <tr><td><code>void setStart(ConnectionPoint start)</code></td><td>Modifie le point de départ (s'il est une sortie).</td></tr>
+    <tr><td><code>void setEnd(ConnectionPoint end)</code></td><td>Modifie le point d'arrivée (s'il est une entrée).</td></tr>
+    <tr><td><code>void draw(Graphics g)</code></td><td>Dessine le fil graphiquement (ligne + extrémités).</td></tr>
+    <tr><td><code>boolean isPointOnWire(int x, int y, int tolerance)</code></td><td>Teste si un point est proche du fil.</td></tr>
+    <tr><td><code>void updatePosition()</code></td><td>Met à jour les coordonnées du fil (placeholder).</td></tr>
+    <tr><td><code>boolean isConnectedTo(MemoryComponent comp)</code></td><td>Teste si le fil est connecté à un composant mémoire donné.</td></tr>
+</table>
+
+<h2>See Also</h2>
+<ul>
+    <li><code>ConnectionPoint</code></li>
+    <li><code>MemoryComponent</code></li>
+</ul>
+
+</body>
+</html>
