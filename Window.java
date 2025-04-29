@@ -263,7 +263,7 @@ public class Window {
      */
     private void showGuideDialog() {
         JDialog dialog = new JDialog(frame, "Guide d'utilisation", true);
-        dialog.setSize(800, 600);
+        dialog.setSize(810, 600);
         dialog.setLocationRelativeTo(frame);
 
         JEditorPane editorPane = new JEditorPane();
@@ -271,7 +271,8 @@ public class Window {
         editorPane.setContentType("text/html");
 
         try {
-            java.net.URL guideUrl = getClass().getResource("/guide.html");
+            java.net.URL guideUrl = getClass().getResource("/guide/guide.html");
+
             if (guideUrl != null) {
                 editorPane.setPage(guideUrl);
 

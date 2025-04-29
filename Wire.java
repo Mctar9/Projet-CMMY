@@ -16,7 +16,7 @@ public class Wire {
         this.end = end;
         connections.add(start);
         connections.add(end);
-        
+
         // Validation de la connexion
         if (start.isInput() || !end.isInput()) {
             throw new IllegalArgumentException("Un fil doit connecter une sortie (output) à une entrée (input)");
@@ -67,30 +67,41 @@ public class Wire {
         }
     }
 
-    //-------------- INTERFACE GRAPHIQUE --------------//
+    // -------------- INTERFACE GRAPHIQUE --------------//
 
     public void draw(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
-        
+
         // Dessin de la ligne principale
         g2d.setStroke(new BasicStroke(3));
         g2d.setColor(Color.BLUE);
         g2d.drawLine(start.getX(), start.getY(), end.getX(), end.getY());
-        
+
         // Cercles aux extrémités
         g2d.setColor(Color.CYAN);
         g2d.fillOval(start.getX() - 3, start.getY() - 3, 6, 6);
         g2d.fillOval(end.getX() - 3, end.getY() - 3, 6, 6);
+
+        // si la connexion est invalide changer la couleur des fils en rouge
+
+        if (!isValidConnection()) {
+            g2d.setColor(Color.RED);
+        } else {
+            g2d.setColor(Color.BLUE);
+        }
     }
-    
+
+    private boolean isValidConnection() {
+        return !start.isInput() && end.isInput();
+    }
+
     public boolean isPointOnWire(int x, int y, int tolerance) {
         return Line2D.ptSegDist(
-            start.getX(), start.getY(),
-            end.getX(), end.getY(),
-            x, y
-        ) < tolerance;
+                start.getX(), start.getY(),
+                end.getX(), end.getY(),
+                x, y) < tolerance;
     }
-    
+
     // Nouvelle méthode pour mettre à jour la position lors des déplacements
     public void updatePosition() {
         // Les ConnectionPoints sont mis à jour automatiquement via MemoryComponent
@@ -99,10 +110,12 @@ public class Wire {
     public boolean isConnectedTo(MemoryComponent comp) {
         // Vérifie si le fil est connecté à ce composant
         for (ConnectionPoint input : comp.getInputs()) {
-            if (input.equals(end)) return true;
+            if (input.equals(end))
+                return true;
         }
         for (ConnectionPoint output : comp.getOutputs()) {
-            if (output.equals(start)) return true;
+            if (output.equals(start))
+                return true;
         }
         return false;
     }
