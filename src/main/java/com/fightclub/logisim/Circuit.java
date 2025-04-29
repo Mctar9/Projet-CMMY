@@ -1,8 +1,13 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Circuit class represents a circuit board where memory components and wires
@@ -332,6 +337,97 @@ public class Circuit extends JPanel {
     class CircuitInstableException extends Exception {
         //Todo: Implémenter la logique d'exception
     }
+
+
+
+
+
+
+
+    public String exportAsText() {
+        StringBuilder sb = new StringBuilder();
+    
+        // Exporter les composants
+        for (MemoryComponent comp : components) {
+            sb.append("Composant:");
+            sb.append(" type=").append(comp.getClass().getSimpleName());
+            sb.append(" id=").append(comp.getId());
+            sb.append(" x=").append(comp.getX());
+            sb.append(" y=").append(comp.getY());
+            sb.append("\n");
+        }
+    
+        // Exporter les connexions (fils)
+        for (Wire wire : wires) {
+            MemoryComponent fromComp = wire.getStart().getParentComponent();
+            MemoryComponent toComp = wire.getEnd().getParentComponent();
+    
+            int fromId = fromComp.getId();
+            int toId = toComp.getId();
+    
+            int fromIndex = fromComp.getOutputs().indexOf(wire.getStart());
+            int toIndex = toComp.getInputs().indexOf(wire.getEnd());
+    
+            sb.append("Connexion: from=").append(fromId).append(".").append(fromIndex)
+              .append(" to=").append(toId).append(".").append(toIndex)
+              .append("\n");
+        }
+    
+        return sb.toString();
+    }
+
+
+
+
+
+    public void importFromFile(File file) throws IOException {
+    components.clear();
+    wires.clear();
+
+    Map<Integer, MemoryComponent> idMap = new HashMap<>();
+    List<String> lignes = Files.readAllLines(file.toPath());
+
+    for (String ligne : lignes) {
+        if (ligne.startsWith("Composant:")) {
+            String[] parts = ligne.split(" ");
+            String type = parts[1].split("=")[1];
+            int id = Integer.parseInt(parts[2].split("=")[1]);
+            int x = Integer.parseInt(parts[3].split("=")[1]);
+            int y = Integer.parseInt(parts[4].split("=")[1]);
+
+            MemoryComponent comp = switch (type) {
+                case "AndGate" -> new AndGate(id, x, y, null, null);
+                case "OrGate" -> new OrGate(id, x, y, null, null);
+                case "NotGate" -> new NotGate(id, x, y, null);
+                case "XorGate" -> new XorGate(id, x, y, null, null);
+                case "NandGate" -> new NandGate(id, x, y, null, null);
+                case "ConstantComponent" -> new ConstantComponent(id, QuadBool.FALSE, x, y); // TODO: gérer valeur
+                default -> null;
+            };
+
+            if (comp != null) {
+                idMap.put(id, comp);
+                components.add(comp);
+            }
+        } else if (ligne.startsWith("Connexion:")) {
+            String[] parts = ligne.split(" ");
+            String from = parts[1].split("=")[1];
+            String to = parts[2].split("=")[1];
+
+            int fromId = Integer.parseInt(from.split("\\.")[0]);
+            int fromIndex = Integer.parseInt(from.split("\\.")[1]);
+            int toId = Integer.parseInt(to.split("\\.")[0]);
+            int toIndex = Integer.parseInt(to.split("\\.")[1]);
+
+            ConnectionPoint src = idMap.get(fromId).getOutputs().get(fromIndex);
+            ConnectionPoint dst = idMap.get(toId).getInputs().get(toIndex);
+
+            wires.add(new Wire(src, dst));
+        }
+    }
+
+    repaint();
+}
 }
 
 

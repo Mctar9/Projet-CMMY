@@ -4,6 +4,9 @@ import javax.swing.border.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 /**
  * Main GUI window for the Logic Circuit Designer.
@@ -203,10 +206,14 @@ public class Window {
         JButton startButton = createToolButton("▶", "Démarrer (Space)");
         JButton pauseButton = createToolButton("⏸", "Pause (P)");
         JButton resetButton = createToolButton("↺", "Réinitialiser (R)");
+        JButton saveButton = createToolButton("ENREGISTRER", "Sauvegarder");
+        JButton openButton = createToolButton("Importer Fichier", "Ouvrir un circuit");
 
         centerPanel.add(startButton);
         centerPanel.add(pauseButton);
         centerPanel.add(resetButton);
+        centerPanel.add(saveButton);
+        centerPanel.add(openButton);
 
         // Sélecteur de vitesse compact à droite
         JPanel rightPanel = new JPanel();
@@ -258,6 +265,8 @@ public class Window {
             statusLabel.setText("Statut: Réinitialisé");
             // À compléter avec la logique de reset 
         });
+        saveButton.addActionListener(e -> sauvegarderCircuit());
+        openButton.addActionListener(e -> chargerCircuit());
 
         return menuBar;
     }
@@ -278,6 +287,7 @@ public class Window {
                 BorderFactory.createEmptyBorder(4, 12, 4, 12)));
 
         // Style hover
+        
         btn.addMouseListener(new MouseAdapter() {
             public void mouseEntered(MouseEvent e) {
                 btn.setBackground(new Color(246, 246, 246));
@@ -294,7 +304,54 @@ public class Window {
                         BorderFactory.createEmptyBorder(4, 12, 4, 12)));
             }
         });
-
+        
         return btn;
     }
+
+
+
+    private void sauvegarderCircuit() {
+    JFileChooser fileChooser = new JFileChooser();
+    fileChooser.setDialogTitle("Sauvegarder le circuit");
+
+    int userSelection = fileChooser.showSaveDialog(frame);
+
+    if (userSelection == JFileChooser.APPROVE_OPTION) {
+        try {
+            String donnees = circuit.exportAsText();
+            String chemin = fileChooser.getSelectedFile().getAbsolutePath();
+
+            //ajouter txt si aucune extention n'est donnée
+            if (!chemin.toLowerCase().endsWith(".txt")) {
+                chemin += ".txt";
+            }
+
+            FileWriter writer = new FileWriter(chemin);
+            writer.write(donnees);
+            writer.close();
+
+            JOptionPane.showMessageDialog(frame, "Circuit sauvegardé avec succès !", "Succès", JOptionPane.INFORMATION_MESSAGE);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(frame, "Erreur lors de la sauvegarde : " + e.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+}
+
+
+private void chargerCircuit() {
+    JFileChooser fileChooser = new JFileChooser();
+    fileChooser.setDialogTitle("Ouvrir un circuit");
+
+    int result = fileChooser.showOpenDialog(frame);
+    if (result == JFileChooser.APPROVE_OPTION) {
+        try {
+            File fichier = fileChooser.getSelectedFile();
+            circuit.importFromFile(fichier);
+            JOptionPane.showMessageDialog(frame, "Circuit chargé !");
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(frame, "Erreur lors du chargement : " + e.getMessage());
+        }
+    }
+}
+
 }
