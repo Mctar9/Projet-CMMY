@@ -1,9 +1,14 @@
+
+//import javax.print.DocFlavor.URL;
 import javax.swing.*;
 import java.awt.*;
 import javax.swing.border.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
+import java.net.URL;
+import java.io.IOException;
+
 public class Window {
     private JFrame frame;
     private Circuit circuit;
@@ -173,6 +178,15 @@ public class Window {
         menuBar.setLayout(new BoxLayout(menuBar, BoxLayout.X_AXIS));
         menuBar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(220, 220, 220)));
 
+        // ajout d'aide dans le menu
+
+        JMenu helpMenu = new JMenu("Aide");
+        helpMenu.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+
+        JMenuItem guideItem = new JMenuItem("Guide d'utilisation");
+        guideItem.addActionListener(e -> showGuideDialog());
+        helpMenu.add(guideItem);
+
         // Contrôles de simulation centrés
         JPanel centerPanel = new JPanel();
         centerPanel.setBackground(Color.GREEN);
@@ -199,7 +213,7 @@ public class Window {
         JLabel clockLabel = new JLabel("Horloge: 0");
         JLabel statusLabel = new JLabel("Statut: Arrêté");
 
-        // Assemblage final
+        menuBar.add(helpMenu);
         menuBar.add(Box.createHorizontalGlue());
         menuBar.add(centerPanel);
         menuBar.add(Box.createHorizontalGlue());
@@ -243,4 +257,44 @@ public class Window {
 
         return btn;
     }
+
+    /**
+     * 
+     */
+    private void showGuideDialog() {
+        JDialog dialog = new JDialog(frame, "Guide d'utilisation", true);
+        dialog.setSize(810, 600);
+        dialog.setLocationRelativeTo(frame);
+
+        JEditorPane editorPane = new JEditorPane();
+        editorPane.setEditable(false);
+        editorPane.setContentType("text/html");
+
+        try {
+            java.net.URL guideUrl = getClass().getResource("/guide/guide.html");
+
+            if (guideUrl != null) {
+                editorPane.setPage(guideUrl);
+
+            } else {
+                editorPane.setText("<h2>Guide non trouvé</h2>");
+
+            }
+        } catch (IOException e) {
+            editorPane.setText("<h2>Erreur de chargement du guide</h2>");
+        }
+
+        JScrollPane scrollPane = new JScrollPane(editorPane);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        dialog.add(scrollPane);
+        JButton closeButton = new JButton("Fermer");
+        closeButton.addActionListener(e -> dialog.dispose());
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(closeButton);
+        dialog.add(buttonPanel, BorderLayout.SOUTH);
+
+        dialog.setVisible(true);
+    }
+
 }

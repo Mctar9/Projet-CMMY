@@ -84,7 +84,7 @@ public class Circuit extends JPanel {
         if (component != null) {
             // Créer une copie pour éviter ConcurrentModificationException
             List<Wire> wiresToRemove = new ArrayList<>();
-            
+
             for (Wire wire : wires) {
                 // Vérifier toutes les entrées du composant
                 for (ConnectionPoint input : component.getInputs()) {
@@ -101,12 +101,13 @@ public class Circuit extends JPanel {
                     }
                 }
             }
-            
+
             wires.removeAll(wiresToRemove);
             components.remove(component);
         } else {
             Wire wire = getWireAt(e.getX(), e.getY());
-            if (wire != null) wires.remove(wire);
+            if (wire != null)
+                wires.remove(wire);
         }
         repaint();
     }
@@ -127,7 +128,7 @@ public class Circuit extends JPanel {
 
     private void handleWireConnection(MouseEvent e) {
         ConnectionPoint clickedPoint = findConnectionPoint(e.getX(), e.getY());
-        
+
         if (clickedPoint == null) {
             firstSelectedPoint = null; // Annule la sélection si on clique ailleurs
             repaint();
@@ -155,10 +156,12 @@ public class Circuit extends JPanel {
     private ConnectionPoint findConnectionPoint(int x, int y) {
         for (MemoryComponent comp : components) {
             for (ConnectionPoint point : comp.getInputs()) {
-                if (point.contains(x, y)) return point;
+                if (point.contains(x, y))
+                    return point;
             }
             for (ConnectionPoint point : comp.getOutputs()) {
-                if (point.contains(x, y)) return point;
+                if (point.contains(x, y))
+                    return point;
             }
         }
         return null;
