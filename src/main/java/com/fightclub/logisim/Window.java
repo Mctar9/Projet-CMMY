@@ -1,17 +1,14 @@
 
 //import javax.print.DocFlavor.URL;
-import javax.swing.*;
 import java.awt.*;
-import javax.swing.border.*;
-import java.awt.event.MouseAdapter;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.net.URL;
-import java.io.IOException;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import javax.swing.*;
+import javax.swing.border.*;
 
 /**
  * Main GUI window for the Logic Circuit Designer.
@@ -393,7 +390,7 @@ private void chargerCircuit() {
         editorPane.setContentType("text/html");
 
         try {
-            java.net.URL guideUrl = getClass().getResource("/guide/guide.html");
+            java.net.URL guideUrl = getClass().getResource("../../../../../guide/guide.html");
 
             if (guideUrl != null) {
                 editorPane.setPage(guideUrl);
