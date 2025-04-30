@@ -1,9 +1,14 @@
+
+//import javax.print.DocFlavor.URL;
 import javax.swing.*;
 import java.awt.*;
 import javax.swing.border.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
+import java.net.URL;
+import java.io.IOException;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -197,77 +202,97 @@ public class Window {
         menuBar.setBackground(new Color(26, 42, 84));
         menuBar.setLayout(new BoxLayout(menuBar, BoxLayout.X_AXIS));
         menuBar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(220, 220, 220)));
-
-        // Contrôles de simulation centrés
+    
+        // --------- GAUCHE : Aide + Sauvegarde + Import ---------
+    
+        JPanel leftPanel = new JPanel();
+        leftPanel.setBackground(new Color(26, 42, 84));
+        leftPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 2));
+    
+        // Bouton d'aide
+        JButton helpButton = createToolButton("AIDE", "Guide d'utilisation");
+        helpButton.setForeground(Color.BLACK);
+        helpButton.setBackground(Color.white);
+        helpButton.addActionListener(e -> showGuideDialog());
+    
+        // Boutons enregistrer et importer
+        JButton saveButton = createToolButton("ENREGISTRER", "Sauvegarder");
+        JButton openButton = createToolButton("IMPORTER", "Ouvrir un circuit");
+    
+        // Couleurs cohérentes
+        saveButton.setForeground(Color.BLACK);
+        saveButton.setBackground(Color.white);
+        openButton.setForeground(Color.BLACK);
+        openButton.setBackground(Color.white);
+    
+        // Ajout au panneau de gauche
+        leftPanel.add(helpButton);
+        leftPanel.add(saveButton);
+        leftPanel.add(openButton);
+    
+        // --------- CENTRE : Simulation ---------
+    
         JPanel centerPanel = new JPanel();
         centerPanel.setBackground(new Color(26, 42, 84));
         centerPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 2));
-
+    
         JButton startButton = createToolButton("▶", "Démarrer (Space)");
         JButton pauseButton = createToolButton("⏸", "Pause (P)");
         JButton resetButton = createToolButton("↺", "Réinitialiser (R)");
-        JButton saveButton = createToolButton("ENREGISTRER", "Sauvegarder");
-        JButton openButton = createToolButton("Importer Fichier", "Ouvrir un circuit");
-
+    
         centerPanel.add(startButton);
         centerPanel.add(pauseButton);
         centerPanel.add(resetButton);
-        centerPanel.add(saveButton);
-        centerPanel.add(openButton);
-
-        // Sélecteur de vitesse compact à droite
+    
+        // --------- DROITE : Horloge et statut ---------
+    
         JPanel rightPanel = new JPanel();
         rightPanel.setBackground(new Color(26, 42, 84));
         rightPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 2));
-
+    
         JComboBox<String> speedSelector = new JComboBox<>(new String[] { "1x", "2x", "5x", "Max" });
-        speedSelector.setPrototypeDisplayValue("1x"); // Réduit la largeur
+        speedSelector.setPrototypeDisplayValue("1x");
         speedSelector.setMaximumSize(new Dimension(60, 25));
         speedSelector.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        
-
+    
         JLabel clockLabel = new JLabel("Horloge: 0");
-        clockLabel.setForeground(Color.white);
+        clockLabel.setForeground(Color.WHITE);
         JLabel statusLabel = new JLabel("Statut: Arrêté");
-        statusLabel.setForeground(Color.white);
+        statusLabel.setForeground(Color.WHITE);
         JLabel vitesse = new JLabel("Vitesse:");
-        vitesse.setForeground(Color.white);
-
-        // Assemblage final
-        menuBar.add(Box.createHorizontalGlue());
-        menuBar.add(centerPanel);
-        menuBar.add(Box.createHorizontalGlue());
+        vitesse.setForeground(Color.WHITE);
+    
         rightPanel.add(vitesse);
         rightPanel.add(speedSelector);
         rightPanel.add(Box.createHorizontalStrut(15));
         rightPanel.add(clockLabel);
         rightPanel.add(Box.createHorizontalStrut(5));
         rightPanel.add(statusLabel);
+    
+        // --------- Assemblage de la barre ---------
+    
+        menuBar.add(leftPanel);
+        menuBar.add(Box.createHorizontalGlue());
+        menuBar.add(centerPanel);
+        menuBar.add(Box.createHorizontalGlue());
         menuBar.add(rightPanel);
-
-        // Ajout des listeners
+    
+        // --------- Listeners ---------
+    
         startButton.addActionListener(e -> {
-                try {
-                    circuit.simuler();
-                } catch (Circuit.CircuitInstableException e1) {
-                    JOptionPane.showMessageDialog(frame, "Circuit instable !", "Erreur", JOptionPane.ERROR_MESSAGE);
-                } // Lance la simulation
-                statusLabel.setText("Statut: En cours");
-            
+            try {
+                circuit.simuler();
+            } catch (Circuit.CircuitInstableException ex) {
+                JOptionPane.showMessageDialog(frame, "Circuit instable !", "Erreur", JOptionPane.ERROR_MESSAGE);
+            }
+            statusLabel.setText("Statut: En cours");
         });
-
-        pauseButton.addActionListener(e -> {
-            statusLabel.setText("Statut: En pause");
-            // À compléter avec la logique de pause
-        });
-
-        resetButton.addActionListener(e -> {
-            statusLabel.setText("Statut: Réinitialisé");
-            // À compléter avec la logique de reset 
-        });
+    
+        pauseButton.addActionListener(e -> statusLabel.setText("Statut: En pause"));
+        resetButton.addActionListener(e -> statusLabel.setText("Statut: Réinitialisé"));
         saveButton.addActionListener(e -> sauvegarderCircuit());
         openButton.addActionListener(e -> chargerCircuit());
-
+    
         return menuBar;
     }
 
@@ -353,5 +378,45 @@ private void chargerCircuit() {
         }
     }
 }
+
+
+    /**
+     * 
+     */
+    private void showGuideDialog() {
+        JDialog dialog = new JDialog(frame, "Guide d'utilisation", true);
+        dialog.setSize(810, 600);
+        dialog.setLocationRelativeTo(frame);
+
+        JEditorPane editorPane = new JEditorPane();
+        editorPane.setEditable(false);
+        editorPane.setContentType("text/html");
+
+        try {
+            java.net.URL guideUrl = getClass().getResource("/guide/guide.html");
+
+            if (guideUrl != null) {
+                editorPane.setPage(guideUrl);
+
+            } else {
+                editorPane.setText("<h2>Guide non trouvé</h2>");
+
+            }
+        } catch (IOException e) {
+            editorPane.setText("<h2>Erreur de chargement du guide</h2>");
+        }
+
+        JScrollPane scrollPane = new JScrollPane(editorPane);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        dialog.add(scrollPane);
+        JButton closeButton = new JButton("Fermer");
+        closeButton.addActionListener(e -> dialog.dispose());
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(closeButton);
+        dialog.add(buttonPanel, BorderLayout.SOUTH);
+
+        dialog.setVisible(true);
+    }
 
 }
