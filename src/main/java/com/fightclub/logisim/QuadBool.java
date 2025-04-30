@@ -48,16 +48,16 @@ public enum QuadBool {
     public QuadBool andz(QuadBool other) {
         // Priorité gauche
         switch (this) {
-            case QuadBool.TRUE:
+            case TRUE:
                 // TRUE propage l'autre valeur, sauf NOTHING
                 return other == QuadBool.NOTHING ? QuadBool.ERR : other;
-            case QuadBool.FALSE:
+            case FALSE:
                 // FALSE écrase sauf pour ERR
                 return other == QuadBool.ERR ? QuadBool.ERR : QuadBool.FALSE;
-            case QuadBool.NOTHING:
+            case NOTHING:
                 // NOTHING est traité comme dangereux
                 return QuadBool.ERR;
-            case QuadBool.ERR:
+            case ERR:
                 // ERR domine
                 return QuadBool.ERR;
             default:
@@ -75,13 +75,13 @@ public enum QuadBool {
      */
     public static QuadBool neg(QuadBool vBool) {
         switch (vBool) {
-            case QuadBool.TRUE:
-                return QuadBool.FALSE;
-            case QuadBool.FALSE:
-                return QuadBool.TRUE;
-            case QuadBool.NOTHING:
+            case TRUE:
+                return FALSE;
+            case FALSE:
+                return TRUE;
+            case NOTHING:
                 return QuadBool.ERR; // L'absence devient incohérence
-            case QuadBool.ERR:
+            case ERR:
                 return QuadBool.ERR; // La contradiction persiste
             default:
                 return QuadBool.ERR;

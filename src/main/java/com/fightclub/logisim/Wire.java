@@ -154,10 +154,10 @@ public class Wire {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setStroke(new BasicStroke(3));
         switch (value) {
-            case QuadBool.TRUE:
+            case TRUE:
                 g2d.setColor(new Color(152, 195, 121)); // Vert clair
                 break;
-            case QuadBool.FALSE:
+            case FALSE:
                 g2d.setColor(new Color(224, 108, 117)); // Rouge clair
                 break;
             default:
