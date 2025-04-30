@@ -1,0 +1,60 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>AndGate Class</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+        h1, h2 { color: #2C3E50; }
+        table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+        th { background-color: #f9f9f9; }
+    </style>
+</head>
+<body>
+
+<h1>AndGate Class</h1>
+<p><strong>public class AndGate extends MemoryComponent</strong></p>
+
+<p>Représente une porte logique AND dans un circuit logique mémoire. Elle hérite de <code>MemoryComponent</code> et redéfinit son rendu graphique.</p>
+
+<h2>Package</h2>
+<p>(aucun package défini)</p>
+
+<h2>Class Overview</h2>
+<ul>
+    <li>Porte logique AND</li>
+    <li>Hérite de MemoryComponent</li>
+    <li>Dessine sa forme (rectangle + arc)</li>
+    <li>Affiche son texte ("AND")</li>
+    <li>Affiche les points de connexion</li>
+    <li>Met une bordure bleue si sélectionnée</li>
+</ul>
+
+<h2>Constructor Summary</h2>
+<table>
+<tr><th>Constructeur</th><th>Description</th></tr>
+<tr>
+<td><code>AndGate(int id, int x, int y)</code></td>
+<td>Crée une porte AND avec un identifiant et une position, et initialise ses points de connexion.</td>
+</tr>
+</table>
+
+<h2>Method Summary</h2>
+<table>
+<tr><th>Signature</th><th>Description</th></tr>
+<tr>
+<td><code>void draw(Graphics g, boolean isSelected)</code></td>
+<td>Dessine la porte AND (forme, texte, points de connexion, bordure si sélectionnée).</td>
+</tr>
+</table>
+
+<h2>See Also</h2>
+<ul>
+    <li><code>MemoryComponent</code></li>
+    <li><code>Graphics2D</code></li>
+</ul>
+
+</body>
+</html>

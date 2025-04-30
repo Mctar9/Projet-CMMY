@@ -1,0 +1,50 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Window Class</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2em; background-color: #f9f9f9; }
+        h1 { color: #2c3e50; }
+        h2 { color: #34495e; }
+        pre { background-color: #eee; padding: 1em; border: 1px solid #ccc; }
+        .section { margin-bottom: 2em; }
+    </style>
+</head>
+<body>
+    <h1>Class Window</h1>
+    <p><strong>Package:</strong> (default)</p>
+    <p>Main GUI window for the Logic Circuit Designer.<br>Initializes the frame, sidebar, circuit area, and controls.</p>
+
+    <div class="section">
+        <h2>Constructor Summary</h2>
+        <pre>public Window()</pre>
+        <p>Constructs the main application window and initializes all components.</p>
+    </div>
+
+    <div class="section">
+        <h2>Method Summary</h2>
+        <pre>private void setupShortcuts()</pre>
+        <p>Sets up keyboard shortcuts for the window (e.g., Ctrl+Q to quit).</p>
+
+        <pre>private JPanel createSidebar()</pre>
+        <p>Creates the sidebar containing logic gate buttons and tools.</p>
+
+        <pre>private void addSection(JPanel parent, String title, String[][] items)</pre>
+        <p>Adds a section to the sidebar with labeled buttons.</p>
+
+        <pre>private JButton createButton(String type, String tooltip)</pre>
+        <p>Creates a stylized JButton with hover effects.</p>
+
+        <pre>private void handleButtonAction(String command)</pre>
+        <p>Handles the logic for each sidebar button based on its command.</p>
+
+        <pre>private JMenuBar createSimulationMenuBar()</pre>
+        <p>Creates the simulation menu bar with play, pause, reset buttons and clock status.</p>
+
+        <pre>private JButton createToolButton(String iconText, String tooltip)</pre>
+        <p>Creates a button for the menu bar with specific icon and tooltip.</p>
+    </div>
+</body>
+</html>
