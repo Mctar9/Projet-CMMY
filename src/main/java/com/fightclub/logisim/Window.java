@@ -390,7 +390,7 @@ private void chargerCircuit() {
         editorPane.setContentType("text/html");
 
         try {
-            java.net.URL guideUrl = getClass().getResource("../../../../../guide/guide.html");
+            java.net.URL guideUrl = getClass().getResource("guide/guide.html");
 
             if (guideUrl != null) {
                 editorPane.setPage(guideUrl);
