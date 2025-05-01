@@ -1,0 +1,5 @@
+Composant: type=AndGate id=1 x=387 y=191
+Composant: type=ConstantComponent id=2 x=64 y=173
+Composant: type=ConstantComponent id=3 x=20 y=373
+Connexion: from=3.0 to=1.1
+Connexion: from=2.0 to=1.0

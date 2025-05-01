@@ -153,17 +153,23 @@ public class Wire {
     public void draw(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setStroke(new BasicStroke(3));
+        
         switch (value) {
             case QuadBool.TRUE:
-                g2d.setColor(new Color(152, 195, 121)); // Vert clair
+                g2d.setColor(new Color(0, 200, 0)); // Vert pour TRUE
                 break;
             case QuadBool.FALSE:
-                g2d.setColor(new Color(224, 108, 117)); // Rouge clair
+                g2d.setColor(new Color(200, 0, 0)); // Rouge pour FALSE
                 break;
+            case QuadBool.ERR:
+                g2d.setColor(new Color(150, 0, 150)); // Violet pour ERR
+                break;
+            case QuadBool.NOTHING:
             default:
-                g2d.setColor(new Color(92, 99, 112)); // Gris bleu
+                g2d.setColor(new Color(100, 100, 100)); // Gris pour NOTHING
                 break;
         }
+        
         g2d.drawLine(start.getX(), start.getY(), end.getX(), end.getY());
     }
 

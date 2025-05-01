@@ -168,4 +168,13 @@ public class ConnectionPoint {
     public QuadBool getValue() {
         return connectedWire.getValue();
     }
+
+    public void connectWire(Wire wire) {
+        this.connectedWire = wire;
+        if (isInput()) {
+            wire.setEnd(this);  // Pour les points d'entrée
+        } else {
+            wire.setStart(this); // Pour les points de sortie
+        }
+    }
 }

@@ -83,9 +83,11 @@ public class Circuit extends JPanel {
             public void mouseReleased(MouseEvent e) {
                 if (wireStartPoint != null) {
                     ConnectionPoint target = findConnectionPoint(e.getX(), e.getY());
-                    if (target != null && target.isInput() &&
-                            !target.getParentComponent().equals(wireStartPoint.getParentComponent())) {
-                        wires.add(new Wire(wireStartPoint, target));
+                    if (target != null && target.isInput()) {
+                        Wire newWire = new Wire(wireStartPoint, target);
+                        wireStartPoint.connectWire(newWire);  // ← Connexion bidirectionnelle
+                        target.connectWire(newWire);          // ← Connexion bidirectionnelle
+                        wires.add(newWire);
                     }
                 }
                 wireStartPoint = null;
