@@ -282,7 +282,7 @@ public class Window {
         startButton.addActionListener(e -> {
             try {
                 circuit.simuler();
-            } catch (Circuit.CircuitInstableException ex) {
+            } catch (CircuitInstableException ex) {
                 JOptionPane.showMessageDialog(frame, "Circuit instable !", "Erreur", JOptionPane.ERROR_MESSAGE);
             }
             statusLabel.setText("Statut: En cours");

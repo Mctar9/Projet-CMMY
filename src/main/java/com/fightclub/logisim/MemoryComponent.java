@@ -245,4 +245,12 @@ public abstract class MemoryComponent {
     public boolean isConnectedTo(Wire wire) {
         return inputs.contains(wire.getEnd()) || outputs.contains(wire.getStart());
     }
+
+    public QuadBool calculerSortie() {
+        this.compute();
+        return outputs.get(0).getWire().getValue();
+        
+    }
+
+  
 }

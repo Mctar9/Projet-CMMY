@@ -24,14 +24,14 @@ public class XorGate extends MemoryComponent {
      * 
      * @author Riyad Derguini
      */
-    public XorGate(int id, int x, int y, QuadBool input1, QuadBool input2) {
+    public XorGate(int id, int x, int y, Wire f1, Wire f2) {
         // Appel du constructeur parent avec un identifiant unique et une position
         // centrée
         super(id, x, y);
         this.type = ComponentType.XOR; // Type de la porte
         initConnectionPoints();
-        this.inputs.get(0).setValue(input1);
-        this.inputs.get(1).setValue(input2);
+        this.inputs.set(0, f1.getEnd());
+        this.inputs.set(1, f2.getEnd());
     }
 
     // --------------méthodes--------------//
@@ -67,7 +67,7 @@ public class XorGate extends MemoryComponent {
         QuadBool aAndNotB = inputs.get(0).getValue().andz(QuadBool.neg(inputs.get(1).getValue()));
         QuadBool bAndNotA = inputs.get(1).getValue().andz(QuadBool.neg(inputs.get(0).getValue()));
 
-        outputs.get(0).setValue(aAndNotB.sup(bAndNotA));
+        outputs.get(0).getWire().setValue(aAndNotB.sup(bAndNotA));
     }
 
     @Override

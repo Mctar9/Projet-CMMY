@@ -21,13 +21,13 @@ public class NotGate extends MemoryComponent {
      * 
      * @author Riyad Derguini
      */
-    public NotGate(int id, int x, int y, QuadBool input) {
+    public NotGate(int id, int x, int y, Wire f) {
         // Appel du constructeur parent avec un identifiant unique et une position
         // centrée
         super(id, x, y);
         this.type = ComponentType.NOT; // Type de la porte
         initConnectionPoints();
-        this.inputs.get(0).setValue(input);
+        this.inputs.set(0, f.getEnd());
     }
 
     // --------------méthodes--------------//
@@ -67,7 +67,7 @@ public class NotGate extends MemoryComponent {
      */
     public void compute() {
 
-        outputs.get(0).setValue(QuadBool.neg(this.inputs.get(0).getValue()));
+        outputs.get(0).getWire().setValue(QuadBool.neg(this.inputs.get(0).getValue()));
 
     }
 

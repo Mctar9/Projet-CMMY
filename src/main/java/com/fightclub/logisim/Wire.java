@@ -81,7 +81,7 @@ public class Wire {
      * @return liste des connexions
      */
     public List<ConnectionPoint> getConnections() {
-        return new ArrayList<>(connections);
+        return this.connections;
     }
 
     /**

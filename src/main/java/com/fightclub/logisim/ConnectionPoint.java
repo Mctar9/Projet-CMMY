@@ -16,7 +16,7 @@ public class ConnectionPoint {
     private boolean isInput; // vrai si c'est une entrée, faux si c'est une sortie
     private boolean highlighted = false; // vrai si le point est surligné
     private MemoryComponent parent; // Composant parent auquel ce point est relié
-    private QuadBool value; // Valeur logique transportée par le point
+    private Wire connectedWire; 
 
     // -------------- CONSTRUCTEURS --------------//
 
@@ -33,7 +33,7 @@ public class ConnectionPoint {
         this.y = y;
         this.isInput = isInput;
         this.parent = parent;
-        this.value = QuadBool.NOTHING; // Valeur par défaut
+        
     }
 
     // --------------SETTEURS ET GETTEURS --------------//
@@ -52,17 +52,17 @@ public class ConnectionPoint {
      * 
      * @param value
      */
-    public void setValue(QuadBool value) {
-        this.value = value;
+    public void setWire(Wire fil) {
+        this.connectedWire = fil;
     }
 
     /**
-     * @return la valeur logique transportée par le point de connexion
+     * @return le fil connecté à ce point de connexion
      * 
      * @author Riyad Derguini
      */
-    public QuadBool getValue() {
-        return this.value;
+    public Wire getWire() {
+        return this.connectedWire;
     }
 
     // -------------- AUTRES MÉTHODES --------------//`
@@ -160,5 +160,12 @@ public class ConnectionPoint {
      */
     public MemoryComponent getParentComponent() {
         return parent;
+    }
+
+    /**
+     * @return la valeur logique transportée par le point de connexion
+     */
+    public QuadBool getValue() {
+        return connectedWire.getValue();
     }
 }

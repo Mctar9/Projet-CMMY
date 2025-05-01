@@ -24,17 +24,19 @@ public class AndGate extends MemoryComponent {
      * 
      * @author Riyad Derguini
      */
-    public AndGate(int id, int x, int y, QuadBool input1, QuadBool input2) {
+    public AndGate(int id, int x, int y, Wire f1, Wire f2) {
         // Appel du constructeur parent avec un identifiant unique et une position
         // centrée
         super(id, x, y);
         this.type = ComponentType.AND; // Type de la porte
         initConnectionPoints();
-        this.inputs.get(0).setValue(input1);
-        this.inputs.get(1).setValue(input2);
+        this.inputs.set(0, f1.getEnd());
+        this.inputs.set(1, f2.getEnd());
     }
 
     // --------------méthodes--------------//
+
+    
 
     /**
      * Initialise les points de connexion de la porte AND.
@@ -68,7 +70,7 @@ public class AndGate extends MemoryComponent {
     @Override
     public void compute() {
 
-        outputs.get(0).setValue(inputs.get(0).getValue().andz(inputs.get(1).getValue()));
+        outputs.get(0).getWire().setValue(inputs.get(0).getValue().andz(inputs.get(1).getValue()));
 
     }
 

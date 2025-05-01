@@ -67,7 +67,7 @@ public class ConstantComponent extends MemoryComponent {
     @Override
     public void compute() {
         if (!outputs.isEmpty()) {
-            outputs.get(0).setValue(value);
+            outputs.get(0).getWire().setValue(value);
         }
     }
 

@@ -18,17 +18,14 @@ public class Circuit extends JPanel {
 
     // --------------Attributs--------------//
 
-
-
     private static final int MAX_ITERATIONS = 1000;
 
     private List<MemoryComponent> components;
     private MemoryComponent selectedComponent;
-    
+
     private List<Wire> wires;
     private ConnectionPoint wireStartPoint;
 
-    
     private Point currentMousePosition;
 
     private boolean addingComponent;
@@ -55,7 +52,6 @@ public class Circuit extends JPanel {
         currentMousePosition = null;
         addingComponent = false;
         deletingMode = false;
-
 
         // Gestion des clics souris
         addMouseListener(new MouseAdapter() {
@@ -121,8 +117,6 @@ public class Circuit extends JPanel {
         });
     }
 
-
-
     // --------------Méthodes--------------//
 
     /**
@@ -175,15 +169,14 @@ public class Circuit extends JPanel {
                 components.add(new NandGate(components.size() + 1, e.getX(), e.getY(), null, null));
                 break;
             case "0":
-                components.add(new ConstantComponent(components.size() + 1,QuadBool.FALSE, e.getX(), e.getY()));
+                components.add(new ConstantComponent(components.size() + 1, QuadBool.FALSE, e.getX(), e.getY()));
                 break;
             case "1":
-                components.add(new ConstantComponent(components.size() + 1,QuadBool.TRUE, e.getX(), e.getY()));
+                components.add(new ConstantComponent(components.size() + 1, QuadBool.TRUE, e.getX(), e.getY()));
                 break;
         }
         repaint();
     }
-
 
     /**
      * Finds a connection point at the specified coordinates.
@@ -206,7 +199,6 @@ public class Circuit extends JPanel {
         return null;
     }
 
-
     /**
      * Gets the component at the specified coordinates.
      *
@@ -220,7 +212,6 @@ public class Circuit extends JPanel {
                 .findFirst()
                 .orElse(null);
     }
-
 
     /**
      * Gets the wire at the specified coordinates.
@@ -254,7 +245,6 @@ public class Circuit extends JPanel {
         deletingMode = true;
     }
 
-
     /**
      * Disables the adding component mode.
      */
@@ -273,80 +263,63 @@ public class Circuit extends JPanel {
         }
     }
 
+    // ------------------last ver simuler-----------------//
     /**
-     * Simule le comportement du circuit jusqu'à trouver un état stable (point fixe).
-     * 
-     * <p>Algorithme :</p>
-     * <ol>
-     *   <li>Initialise tous les fils à la valeur I (état initial)</li>
-     *   <li>Répète jusqu'à MAX_ITERATIONS :
-     *     <ul>
-     *       <li>Pour chaque fil, calcule sa nouvelle valeur basée sur les sorties des composants connectés</li>
-     *       <li>Compare avec l'ancienne valeur</li>
-     *       <li>Si aucune valeur n'a changé (point fixe atteint), termine avec succès</li>
-     *     </ul>
-     *   </li>
-     *   <li>Si MAX_ITERATIONS est atteint sans convergence, lève une exception</li>
-     * </ol>
-     * 
-     * @throws CircuitInstableException si aucun point fixe n'est trouvé après MAX_ITERATIONS
-     */
-    public void simuler() throws CircuitInstableException {
+ * Simule le circuit jusqu'à trouver un état stable
+ * @throws CircuitInstableException si la simulation ne converge pas
+ */
+public void simuler() throws CircuitInstableException {
+    // 1. Initialisation
+    for (Wire fil : wires) {
+        fil.setValue(QuadBool.NOTHING);
+    }
 
-        //petit test pour riadh pour tester que la methode simuler est lancé. CHECK IT BROO !!!!!!!!!!!!
-        this.setBackground(Color.BLACK);
-        
+    // 2. Recherche du point fixe
+    for (int i = 0; i < MAX_ITERATIONS; i++) {
+        boolean stable = true;
 
-        // Étape 1: Initialisation
+        // Pour chaque fil
         for (Wire fil : wires) {
-            fil.setValue(QuadBool.NOTHING); // Valeur initiale
-        }
+            QuadBool nouvelleValeur = QuadBool.NOTHING;
 
-        // Étape 2: Recherche du point fixe
-        for (int i = 0; i < MAX_ITERATIONS; i++) {
-            boolean stable = true;
-
-            // Pour chaque fil du circuit
-            for (Wire fil : wires) {
-                //Todo: Vérifier si le fil est connecté à un composant mémoire
+            // Calculer la valeur à partir des composants connectés
+            for (ConnectionPoint point : fil.getConnections()) {
+                if (!point.isInput()) { // Si c'est une sortie
+                    MemoryComponent comp = point.getParentComponent();
+                    
+                    // Récupérer les valeurs des entrées
+                    List<QuadBool> entrees = new ArrayList<>();
+                    for (ConnectionPoint entree : comp.getInputs()) {
+                        entrees.add(entree.getWire() != null ? entree.getWire().getValue() : QuadBool.NOTHING);
+                    }
+                    
+                    // Calculer la sortie
+                    QuadBool sortie = comp.calculerSortie();
+                    nouvelleValeur = nouvelleValeur.sup(sortie);
+                }
             }
 
-            // Point fixe atteint
-            if (stable) {
-               //Todo: Afficher les valeurs finales des fils
+            // Mettre à jour si nécessaire
+            if (!fil.getValue().equals(nouvelleValeur)) {
+                fil.setValue(nouvelleValeur);
+                stable = false;
             }
         }
 
-        // Échec de convergence
-        //Todo: Lève une exception
+        if (stable) {
+            return; // Circuit stable
+        }
     }
 
-    /**
-     * Calcule la nouvelle valeur d'un fil en fonction des composants connectés.
-     * 
-     * @param fil le fil dont on veut calculer la valeur
-     * @return la valeur QuadBool résultante (supremum des sorties connectées)
-     
-    private QuadBool calculerValeurFil(Wire fil) {
-        //Todo: Implémenter la logique de calcul
-    }*/
-
-        /**
-     * Exception levée lorsque le circuit n'atteint pas un état stable.
-     */
-    class CircuitInstableException extends Exception {
-        //Todo: Implémenter la logique d'exception
-    }
+    throw new CircuitInstableException("Pas de point fixe après " + MAX_ITERATIONS + " itérations");
+}
 
 
-
-
-
-
+    ////////////////////////////////////////////////////////////////////////////
 
     public String exportAsText() {
         StringBuilder sb = new StringBuilder();
-    
+
         // Exporter les composants
         for (MemoryComponent comp : components) {
             sb.append("Composant:");
@@ -356,81 +329,72 @@ public class Circuit extends JPanel {
             sb.append(" y=").append(comp.getY());
             sb.append("\n");
         }
-    
+
         // Exporter les connexions (fils)
         for (Wire wire : wires) {
             MemoryComponent fromComp = wire.getStart().getParentComponent();
             MemoryComponent toComp = wire.getEnd().getParentComponent();
-    
+
             int fromId = fromComp.getId();
             int toId = toComp.getId();
-    
+
             int fromIndex = fromComp.getOutputs().indexOf(wire.getStart());
             int toIndex = toComp.getInputs().indexOf(wire.getEnd());
-    
+
             sb.append("Connexion: from=").append(fromId).append(".").append(fromIndex)
-              .append(" to=").append(toId).append(".").append(toIndex)
-              .append("\n");
+                    .append(" to=").append(toId).append(".").append(toIndex)
+                    .append("\n");
         }
-    
+
         return sb.toString();
     }
 
-
-
-
-
     public void importFromFile(File file) throws IOException {
-    components.clear();
-    wires.clear();
+        components.clear();
+        wires.clear();
 
-    Map<Integer, MemoryComponent> idMap = new HashMap<>();
-    List<String> lignes = Files.readAllLines(file.toPath());
+        Map<Integer, MemoryComponent> idMap = new HashMap<>();
+        List<String> lignes = Files.readAllLines(file.toPath());
 
-    for (String ligne : lignes) {
-        if (ligne.startsWith("Composant:")) {
-            String[] parts = ligne.split(" ");
-            String type = parts[1].split("=")[1];
-            int id = Integer.parseInt(parts[2].split("=")[1]);
-            int x = Integer.parseInt(parts[3].split("=")[1]);
-            int y = Integer.parseInt(parts[4].split("=")[1]);
+        for (String ligne : lignes) {
+            if (ligne.startsWith("Composant:")) {
+                String[] parts = ligne.split(" ");
+                String type = parts[1].split("=")[1];
+                int id = Integer.parseInt(parts[2].split("=")[1]);
+                int x = Integer.parseInt(parts[3].split("=")[1]);
+                int y = Integer.parseInt(parts[4].split("=")[1]);
 
-            MemoryComponent comp = switch (type) {
-                case "AndGate" -> new AndGate(id, x, y, null, null);
-                case "OrGate" -> new OrGate(id, x, y, null, null);
-                case "NotGate" -> new NotGate(id, x, y, null);
-                case "XorGate" -> new XorGate(id, x, y, null, null);
-                case "NandGate" -> new NandGate(id, x, y, null, null);
-                case "ConstantComponent" -> new ConstantComponent(id, QuadBool.FALSE, x, y); // TODO: gérer valeur
-                default -> null;
-            };
+                MemoryComponent comp = switch (type) {
+                    case "AndGate" -> new AndGate(id, x, y, null, null);
+                    case "OrGate" -> new OrGate(id, x, y, null, null);
+                    case "NotGate" -> new NotGate(id, x, y, null);
+                    case "XorGate" -> new XorGate(id, x, y, null, null);
+                    case "NandGate" -> new NandGate(id, x, y, null, null);
+                    case "ConstantComponent" -> new ConstantComponent(id, QuadBool.FALSE, x, y); // TODO: gérer valeur
+                    default -> null;
+                };
 
-            if (comp != null) {
-                idMap.put(id, comp);
-                components.add(comp);
+                if (comp != null) {
+                    idMap.put(id, comp);
+                    components.add(comp);
+                }
+            } else if (ligne.startsWith("Connexion:")) {
+                String[] parts = ligne.split(" ");
+                String from = parts[1].split("=")[1];
+                String to = parts[2].split("=")[1];
+
+                int fromId = Integer.parseInt(from.split("\\.")[0]);
+                int fromIndex = Integer.parseInt(from.split("\\.")[1]);
+                int toId = Integer.parseInt(to.split("\\.")[0]);
+                int toIndex = Integer.parseInt(to.split("\\.")[1]);
+
+                ConnectionPoint src = idMap.get(fromId).getOutputs().get(fromIndex);
+                ConnectionPoint dst = idMap.get(toId).getInputs().get(toIndex);
+
+                wires.add(new Wire(src, dst));
             }
-        } else if (ligne.startsWith("Connexion:")) {
-            String[] parts = ligne.split(" ");
-            String from = parts[1].split("=")[1];
-            String to = parts[2].split("=")[1];
-
-            int fromId = Integer.parseInt(from.split("\\.")[0]);
-            int fromIndex = Integer.parseInt(from.split("\\.")[1]);
-            int toId = Integer.parseInt(to.split("\\.")[0]);
-            int toIndex = Integer.parseInt(to.split("\\.")[1]);
-
-            ConnectionPoint src = idMap.get(fromId).getOutputs().get(fromIndex);
-            ConnectionPoint dst = idMap.get(toId).getInputs().get(toIndex);
-
-            wires.add(new Wire(src, dst));
         }
+
+        repaint();
     }
-
-    repaint();
 }
-}
-
-
-
-
-
