@@ -241,7 +241,50 @@ public class Window {
         rightPanel.add(Box.createHorizontalStrut(5));
         rightPanel.add(statusLabel);
         menuBar.add(rightPanel);
-
+    
+        // --------- Listeners ---------
+    
+        startButton.addActionListener(e -> {
+            try {
+                circuit.simuler();
+                circuit.repaint();
+            } catch (CircuitInstableException ex) {
+                JOptionPane.showMessageDialog(frame, "Circuit instable !", "Erreur", JOptionPane.ERROR_MESSAGE);
+            }
+            statusLabel.setText("Statut: En cours");
+        });
+    
+        pauseButton.addActionListener(e -> {
+            circuit.pause();
+            if (circuit.isPaused()) {
+                statusLabel.setText("Statut: En pause");
+            } else {
+                statusLabel.setText("Statut: Reprise");
+                try {
+                    circuit.simuler(); // Optionnel : relancer une simulation
+                    circuit.repaint();
+                } catch (CircuitInstableException ex) {
+                    JOptionPane.showMessageDialog(frame, "Circuit instable !", "Erreur", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+        
+        resetButton.addActionListener(e -> {
+            int confirm = JOptionPane.showConfirmDialog(
+                frame,
+                "Voulez-vous vraiment tout effacer ?",
+                "Confirmation",
+                JOptionPane.YES_NO_OPTION
+            );
+            if (confirm == JOptionPane.YES_OPTION) {
+                circuit.clearAll();    
+                circuit.repaint();        
+                statusLabel.setText("Statut: Réinitialisé");
+            }
+        });
+        saveButton.addActionListener(e -> sauvegarderCircuit());
+        openButton.addActionListener(e -> chargerCircuit());
+    
         return menuBar;
     }
 
