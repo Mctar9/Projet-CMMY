@@ -15,5 +15,6 @@ public enum ComponentType {
     XOR,
     XNOR,
     HIGH,
-    LOW 
+    LOW,
+    LED,
 }

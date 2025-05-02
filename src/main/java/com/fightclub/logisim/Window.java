@@ -210,25 +210,29 @@ public class Window {
         leftPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 2));
     
         // Bouton d'aide
-        JButton helpButton = createToolButton("AIDE", "Guide d'utilisation");
-        helpButton.setForeground(Color.BLACK);
-        helpButton.setBackground(Color.white);
+        JButton helpButton = createToolButton("💡", "Guide d'utilisation");
+        helpButton.setForeground(Color.YELLOW);
+        helpButton.setBackground(Color.BLACK);
         helpButton.addActionListener(e -> showGuideDialog());
     
         // Boutons enregistrer et importer
-        JButton saveButton = createToolButton("ENREGISTRER", "Sauvegarder");
-        JButton openButton = createToolButton("IMPORTER", "Ouvrir un circuit");
+        JButton saveButton = createToolButton("💾", "Sauvegarder");
+        JButton openButton = createToolButton("📁", "Ouvrir un circuit");
+        JButton importComponentButton = createToolButton("IMPORTER COMPOSANT", "Ajouter un composant depuis un fichier");
     
         // Couleurs cohérentes
-        saveButton.setForeground(Color.BLACK);
-        saveButton.setBackground(Color.white);
+        //saveButton.setForeground(Color.BLACK);
+        saveButton.setBackground(Color.CYAN);
         openButton.setForeground(Color.BLACK);
         openButton.setBackground(Color.white);
+        importComponentButton.setForeground(Color.BLACK);
+        importComponentButton.setBackground(Color.white);
     
         // Ajout au panneau de gauche
         leftPanel.add(helpButton);
         leftPanel.add(saveButton);
         leftPanel.add(openButton);
+        leftPanel.add(importComponentButton);
     
         // --------- CENTRE : Simulation ---------
     
@@ -293,6 +297,7 @@ public class Window {
         resetButton.addActionListener(e -> statusLabel.setText("Statut: Réinitialisé"));
         saveButton.addActionListener(e -> sauvegarderCircuit());
         openButton.addActionListener(e -> chargerCircuit());
+        //importComponentButton.addActionListener(e -> importComponent());
     
         return menuBar;
     }

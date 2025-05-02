@@ -1,74 +1,54 @@
 import java.awt.*;
+import java.util.ArrayList;
 
-/**
- * Représente une LED dans un circuit logique.
- * La LED s'allume en vert lorsque le signal d'entrée est à 1, sinon elle reste éteinte.
- */
 public class LedLight extends MemoryComponent {
-    private Wire inputWire; // Le fil connecté à l'entrée de la LED
 
-    /**
-     * Construit une LED à la position spécifiée.
-     * @param id Identifiant unique
-     * @param x Position en x
-     * @param y Position en y
-     */
     public LedLight(int id, int x, int y) {
         super(id, x, y);
+        this.type = ComponentType.LED;
         initConnectionPoints();
     }
 
-    /**
-     * Dessine la LED sur le circuit.
-     * @param g Contexte graphique
-     * @param isSelected Vrai si le composant est sélectionné
-     */
+    @Override
+    protected void initConnectionPoints() {
+        inputs = new ArrayList<>(1);
+        outputs = new ArrayList<>(0); // Une LED n'a pas de sortie
+
+        // Une seule entrée centrée à gauche
+        inputs.add(new ConnectionPoint(this, getX(), getY() + getHeight()/2, true));
+    }
+
     @Override
     public void draw(Graphics g, boolean isSelected) {
-        Graphics2D g2d = (Graphics2D) g;
-
-        // Définit la couleur de la LED selon le signal d'entrée
-        Color ledColor = Color.DARK_GRAY; // État éteint par défaut
-        if (inputWire != null && "1".equals(inputWire.getValue())) {
-            ledColor = new Color(152, 195, 121); // Vert clair lorsqu'allumée
+        Graphics2D g2d = (Graphics2D)g;
+        
+        // Couleur basée sur QuadBool
+        Color ledColor;
+        if (getInputValue() == QuadBool.TRUE) {
+            ledColor = Color.GREEN; // Vert vif allumé
+        } else if (getInputValue() == QuadBool.FALSE) {
+            ledColor = Color.RED; // Gris foncé éteint
+        } else {
+            ledColor = new Color(255, 165, 0); // Orange pour états spéciaux
         }
 
-        // Dessine le corps de la LED
+        // Corps de la LED
         g2d.setColor(ledColor);
         g2d.fillOval(getX(), getY(), getWidth(), getHeight());
 
-        // Dessine le contour de la LED
-        g2d.setColor(Color.LIGHT_GRAY);
+        // Contour
+        g2d.setColor(isSelected ? Color.BLUE : Color.BLACK);
         g2d.drawOval(getX(), getY(), getWidth(), getHeight());
 
-        // Dessine le label
-        g2d.setColor(Color.WHITE);
-        g2d.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        g2d.drawString("LED", getX() + getWidth()/4, getY() + getHeight()/2);
-
-        // Dessine la surbrillance si sélectionnée
-        if (isSelected) {
-            g2d.setColor(new Color(97, 175, 239));
-            g2d.drawRect(getX(), getY(), getWidth(), getHeight());
-        }
-
+        // Dessin des points de connexion
         drawConnectionPoints(g2d);
     }
 
-    /**
-     * Définit le fil d'entrée pour cette LED.
-     * @param wire Le fil d'entrée à connecter
-     */
-    public void setInputWire(Wire wire) {
-        this.inputWire = wire;
-    }
-
-    /**
-     * Vérifie l'état actuel de la LED.
-     * @return Vrai si la LED est allumée (entrée à 1), faux sinon
-     */
-    public boolean isLit() {
-        return inputWire != null && "1".equals(inputWire.getValue());
+    private QuadBool getInputValue() {
+        if (!inputs.isEmpty() && inputs.get(0).getWire() != null) {
+            return inputs.get(0).getWire().getValue();
+        }
+        return QuadBool.NOTHING;
     }
 
     @Override

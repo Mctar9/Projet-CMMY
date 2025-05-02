@@ -140,6 +140,12 @@ public abstract class MemoryComponent {
         }
     }
 
+    // Pour les touches clavier (déplacement relatif)
+    public void move(int dx, int dy) {
+        this.x += dx;
+        this.y += dy;
+    }
+
     /**
      * Vérifie si un point (px, py) est à l'intérieur du composant.
      * 
@@ -220,21 +226,7 @@ public abstract class MemoryComponent {
     /**
      * Initialise ou met à jour les points de connexion du composant.
      */
-    protected void initConnectionPoints() {
-        if (inputs.isEmpty()) {
-            inputs.add(new ConnectionPoint(this, x, y + HEIGHT / 3, true));
-            inputs.add(new ConnectionPoint(this, x, y + 2 * HEIGHT / 3, true));
-        } else {
-            inputs.get(0).updatePosition(x, y + HEIGHT / 3);
-            inputs.get(1).updatePosition(x, y + 2 * HEIGHT / 3);
-        }
-
-        if (outputs.isEmpty()) {
-            outputs.add(new ConnectionPoint(this, x + WIDTH, y + HEIGHT / 2, false));
-        } else {
-            outputs.get(0).updatePosition(x + WIDTH, y + HEIGHT / 2);
-        }
-    }
+    protected abstract void initConnectionPoints();
 
     /**
      * Vérifie si un fil est connecté à ce composant.

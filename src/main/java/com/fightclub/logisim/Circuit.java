@@ -63,13 +63,14 @@ public class Circuit extends JPanel {
                     repaint();
                     return;
                 }
-
+            
                 if (deletingMode) {
                     deleteComponentOrWire(e);
                     deletingMode = false;
                     return;
                 }
-
+            
+                // D'abord vérifier si on clique sur un point de connexion (pour les fils)
                 ConnectionPoint p = findConnectionPoint(e.getX(), e.getY());
                 if (p != null && !p.isInput()) {
                     wireStartPoint = p;
@@ -77,8 +78,8 @@ public class Circuit extends JPanel {
                 } else {
                     selectedComponent = getComponent(e.getX(), e.getY());
                 }
-            }
-
+            }      
+            
             @Override
             public void mouseReleased(MouseEvent e) {
                 if (wireStartPoint != null) {
@@ -89,10 +90,9 @@ public class Circuit extends JPanel {
                         target.connectWire(newWire);          // ← Connexion bidirectionnelle
                         wires.add(newWire);
                     }
+                    wireStartPoint = null;
+                    currentMousePosition = null;
                 }
-                wireStartPoint = null;
-                currentMousePosition = null;
-                selectedComponent = null;
                 repaint();
             }
         });
@@ -114,7 +114,27 @@ public class Circuit extends JPanel {
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                // Rien pour l'instant
+                if (selectedComponent == null) return;
+                
+                int step = 20; // Pas de déplacement
+                switch(e.getKeyCode()) {
+                    case KeyEvent.VK_LEFT:  
+                        selectedComponent.move(-step, 0);
+                        break;
+                    case KeyEvent.VK_RIGHT: 
+                        selectedComponent.move(step, 0);
+                        break;
+                    case KeyEvent.VK_UP:    
+                        selectedComponent.move(0,step);
+                        break;
+                    case KeyEvent.VK_DOWN:  
+                        selectedComponent.move(0,-step);
+                        break;
+                    case KeyEvent.VK_R:     
+                        selectedComponent.rotate();
+                        break;
+                }
+                repaint();
             }
         });
     }
@@ -175,6 +195,9 @@ public class Circuit extends JPanel {
                 break;
             case "1":
                 components.add(new ConstantComponent(components.size() + 1, QuadBool.TRUE, e.getX(), e.getY()));
+                break;
+            case "LED":
+                components.add(new LedLight(components.size() + 1, e.getX(), e.getY()));
                 break;
         }
         repaint();

@@ -113,8 +113,10 @@ public class AndGate extends MemoryComponent {
 
         // Bordure de sélection
         if (isSelected) {
-            g2d.setColor(Color.BLUE);
-            g2d.drawRect(getX(), getY(), getWidth(), getHeight());
+            g.setColor(Color.BLUE);
+            ((Graphics2D)g).setStroke(new BasicStroke(2));
+            g.drawRect(getX()-2, getY()-2, getWidth()+4, getHeight()+4);
         }
+    
     }
 }
