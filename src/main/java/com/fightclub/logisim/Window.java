@@ -289,7 +289,21 @@ public class Window {
             statusLabel.setText("Statut: En cours");
         });
     
-        pauseButton.addActionListener(e -> statusLabel.setText("Statut: En pause"));
+        pauseButton.addActionListener(e -> {
+            circuit.pause();
+            if (circuit.isPaused()) {
+                statusLabel.setText("Statut: En pause");
+            } else {
+                statusLabel.setText("Statut: Reprise");
+                try {
+                    circuit.simuler(); // Optionnel : relancer une simulation
+                    circuit.repaint();
+                } catch (CircuitInstableException ex) {
+                    JOptionPane.showMessageDialog(frame, "Circuit instable !", "Erreur", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+        
         resetButton.addActionListener(e -> {
             int confirm = JOptionPane.showConfirmDialog(
                 frame,
