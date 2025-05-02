@@ -96,7 +96,7 @@ public class Circuit extends JPanel {
                 repaint();
             }
         });
-
+        
         // Déplacement de la souris
         addMouseMotionListener(new MouseMotionAdapter() {
             @Override
@@ -146,6 +146,14 @@ public class Circuit extends JPanel {
         }
         repaint();
     }
+    public void clearAll() {
+        components.clear();
+        wires.clear();
+        selectedComponent = null;
+        wireStartPoint = null;
+        currentMousePosition = null;
+        repaint();
+    };
 
     /**
      * Adds a new component to the circuit at the specified mouse event location.

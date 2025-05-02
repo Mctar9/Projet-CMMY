@@ -290,7 +290,19 @@ public class Window {
         });
     
         pauseButton.addActionListener(e -> statusLabel.setText("Statut: En pause"));
-        resetButton.addActionListener(e -> statusLabel.setText("Statut: Réinitialisé"));
+        resetButton.addActionListener(e -> {
+            int confirm = JOptionPane.showConfirmDialog(
+                frame,
+                "Voulez-vous vraiment tout effacer ?",
+                "Confirmation",
+                JOptionPane.YES_NO_OPTION
+            );
+            if (confirm == JOptionPane.YES_OPTION) {
+                circuit.clearAll();    
+                circuit.repaint();        
+                statusLabel.setText("Statut: Réinitialisé");
+            }
+        });
         saveButton.addActionListener(e -> sauvegarderCircuit());
         openButton.addActionListener(e -> chargerCircuit());
     
