@@ -29,9 +29,6 @@ public class NandGate extends MemoryComponent {
         super(id, x, y);
         this.type = ComponentType.NAND; // Type de la porte
         initConnectionPoints();
-        this.inputs.set(0, f1.getEnd());
-        this.inputs.set(1, f2.getEnd());
-        
     }
 
     // --------------méthodes--------------//

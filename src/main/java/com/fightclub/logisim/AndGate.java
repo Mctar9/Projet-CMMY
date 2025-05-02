@@ -103,7 +103,7 @@ public class AndGate extends MemoryComponent {
 
         // Texte
         g2d.setColor(Color.BLACK);
-        g2d.drawString("AND", 15, getHeight() / 2 + 5);
+        g2d.drawString(type.toString(), 15, getHeight() / 2 + 5);
 
         // Restauration de la transformation
         g2d.setTransform(oldTransform);

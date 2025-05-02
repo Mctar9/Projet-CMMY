@@ -27,7 +27,6 @@ public class NotGate extends MemoryComponent {
         super(id, x, y);
         this.type = ComponentType.NOT; // Type de la porte
         initConnectionPoints();
-        this.inputs.set(0, f.getEnd());
     }
 
     // --------------méthodes--------------//
