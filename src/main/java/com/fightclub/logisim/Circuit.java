@@ -33,7 +33,6 @@ public class Circuit extends JPanel {
     private String addingComponentType;
     private boolean paused = false;
 
-
     // --------------Constructeur--------------//
 
     /**
@@ -334,8 +333,6 @@ public void simuler() throws CircuitInstableException {
 
     throw new CircuitInstableException("Pas de point fixe après " + MAX_ITERATIONS + " itérations");
 }
-
-
     ////////////////////////////////////////////////////////////////////////////
 
     public String exportAsText() {
