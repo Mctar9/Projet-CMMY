@@ -393,10 +393,13 @@ public void simuler() throws CircuitInstableException {
                 ConnectionPoint src = idMap.get(fromId).getOutputs().get(fromIndex);
                 ConnectionPoint dst = idMap.get(toId).getInputs().get(toIndex);
 
-                wires.add(new Wire(src, dst));
+                Wire wire = new Wire(src, dst);
+                src.connectWire(wire);
+                dst.connectWire(wire);
+                wires.add(wire);
             }
         }
-
+        
         repaint();
     }
 }
