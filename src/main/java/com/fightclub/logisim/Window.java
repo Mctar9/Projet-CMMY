@@ -1,9 +1,14 @@
-import javax.swing.*;
+
+//import javax.print.DocFlavor.URL;
 import java.awt.*;
-import javax.swing.border.*;
-import java.awt.event.MouseAdapter;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import javax.swing.*;
+import javax.swing.border.*;
 
 /**
  * Main GUI window for the Logic Circuit Designer.
@@ -17,7 +22,11 @@ public class Window {
      * Constructs the main application window and initializes all components.
      */
     public Window() {
+         
         frame = new JFrame("Logic Circuit Designer");
+
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        frame.setMinimumSize(new Dimension(800, 600));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(1200, 800);
         frame.getContentPane().setBackground(Color.WHITE); // zone princupal en fond blanc
@@ -25,7 +34,9 @@ public class Window {
 
         // Configuration du layout principal
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        splitPane.setDividerSize(3);
+        splitPane.setResizeWeight(0.2);  //redimensionnement
+        splitPane.setContinuousLayout(true);  //redessiner automatiquement
+        splitPane.setDividerSize(8);
         splitPane.setDividerLocation(200); // Largeur augmentée pour les images
 
         circuit = new Circuit();
@@ -43,6 +54,7 @@ public class Window {
      * Sets up keyboard shortcuts for the window (e.g., Ctrl+Q to quit).
      */
     private void setupShortcuts() {
+        // Action pour fermer l'application (Ctrl+Q)
         AbstractAction closeAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -50,11 +62,59 @@ public class Window {
                 System.exit(0);
             }
         };
-
+    
+        // Action pour le mode suppression 
+        AbstractAction deleteAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                circuit.enableDeletingMode();
+            }
+        };
+    
+        // Action pour relancer la dernier boutons appuyer si le souris est toujours dessus
+        AbstractAction spaceAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    circuit.simuler();
+                    circuit.repaint();
+                } catch (CircuitInstableException ex) {
+                    JOptionPane.showMessageDialog(frame, "Circuit instable !", "Erreur", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        };
+    
+        // Action pour le plein écran (F11)
+        AbstractAction fullscreenAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                boolean isFullscreen = (frame.getExtendedState() & JFrame.MAXIMIZED_BOTH) != 0;
+                frame.setExtendedState(isFullscreen ? JFrame.NORMAL : JFrame.MAXIMIZED_BOTH);
+            }
+        };
+    
+        // Configuration des raccourcis
         JRootPane rootPane = frame.getRootPane();
-        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("ctrl Q"), "closeAction");
-        rootPane.getActionMap().put("closeAction", closeAction);
+        InputMap inputMap = rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap actionMap = rootPane.getActionMap();
+    
+        // Fermeture
+        inputMap.put(KeyStroke.getKeyStroke("ctrl Q"), "closeAction");
+        actionMap.put("closeAction", closeAction);
+    
+        // Suppression
+        inputMap.put(KeyStroke.getKeyStroke("DELETE"), "deleteAction");
+        actionMap.put("deleteAction", deleteAction);
+    
+        
+        inputMap.put(KeyStroke.getKeyStroke("SPACE"), "spaceAction");
+        actionMap.put("spaceAction", spaceAction);
+    
+        // Plein écran
+        inputMap.put(KeyStroke.getKeyStroke("ctrl F"), "fullscreenAction");
+        actionMap.put("fullscreenAction", fullscreenAction);
 
+       
     }
 
     /**
@@ -85,7 +145,6 @@ public class Window {
 
         // Section Outils
         addSection(sidebar, "OUTILS", new String[][] {
-                { "CONNECT", "Mode Connexion" },
                 { "DELETE", "Mode Suppression" }
         });
 
@@ -139,34 +198,14 @@ public class Window {
     private JButton createButton(String type, String tooltip) {
         JButton btn = new JButton();
         btn.setToolTipText(tooltip);
-        btn.setBackground(new Color(50, 50, 50));
+        btn.setBackground(new Color(140,146,172));
         btn.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         btn.setPreferredSize(new Dimension(120, 80));
 
         // Fallback textuel
         btn.setText(type);
-        btn.setForeground(Color.WHITE);
+        btn.setForeground(Color.BLACK);
         btn.setFont(new Font("Segoe UI", Font.BOLD, 12));
-
-        // Effet hover
-        btn.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                btn.setBackground(new Color(65, 65, 65));
-                btn.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(new Color(100, 100, 100)),
-                        BorderFactory.createEmptyBorder(12, 12, 12, 12)));
-
-            }
-
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                btn.setBackground(new Color(50, 50, 50));
-                btn.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(new Color(80, 80, 80)),
-                        BorderFactory.createEmptyBorder(12, 12, 12, 12)));
-
-            }
-        });
-
         return btn;
     }
 
@@ -176,15 +215,12 @@ public class Window {
      */
     private void handleButtonAction(String command) {
         switch (command) {
-            case "CONNECT":
-                circuit.enableConnectingMode();
-                break;
             case "DELETE":
                 circuit.enableDeletingMode();
                 break;
             default:
                 // Utiliser directement la commande comme type
-                circuit.enableAddingComponent(command.toUpperCase());
+                circuit.enableAddingComponent(command);
                 break;
         }
     }
@@ -198,48 +234,74 @@ public class Window {
         menuBar.setBackground(new Color(26, 42, 84));
         menuBar.setLayout(new BoxLayout(menuBar, BoxLayout.X_AXIS));
         menuBar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(220, 220, 220)));
-
-        // Contrôles de simulation centrés
+    
+        // --------- GAUCHE : Aide + Sauvegarde + Import ---------
+    
+        JPanel leftPanel = new JPanel();
+        leftPanel.setBackground(new Color(26, 42, 84));
+        leftPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 2));
+    
+        // Bouton d'aide
+        JButton helpButton = createToolButton("💡", "Guide d'utilisation");
+        helpButton.setForeground(Color.YELLOW);
+        helpButton.addActionListener(e -> showGuideDialog());
+    
+        // Boutons enregistrer et importer
+        JButton saveButton = createToolButton("💾", "Sauvegarder");
+        JButton openButton = createToolButton("📁", "Ouvrir un circuit");
+        JButton importComponentButton = createToolButton("IMPORTER COMPOSANT", "Ajouter un composant depuis un fichier");
+    
+        // Ajout au panneau de gauche
+        leftPanel.add(helpButton);
+        leftPanel.add(saveButton);
+        leftPanel.add(openButton);
+        leftPanel.add(importComponentButton);
+    
+        // --------- CENTRE : Simulation ---------
+    
         JPanel centerPanel = new JPanel();
         centerPanel.setBackground(new Color(26, 42, 84));
         centerPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 2));
-
+    
         JButton startButton = createToolButton("▶", "Démarrer (Space)");
         JButton pauseButton = createToolButton("⏸", "Pause (P)");
         JButton resetButton = createToolButton("↺", "Réinitialiser (R)");
-
+    
         centerPanel.add(startButton);
         centerPanel.add(pauseButton);
         centerPanel.add(resetButton);
-
-        // Sélecteur de vitesse compact à droite
+    
+        // --------- DROITE : Horloge et statut ---------
+    
         JPanel rightPanel = new JPanel();
         rightPanel.setBackground(new Color(26, 42, 84));
         rightPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 2));
-
+    
         JComboBox<String> speedSelector = new JComboBox<>(new String[] { "1x", "2x", "5x", "Max" });
-        speedSelector.setPrototypeDisplayValue("1x"); // Réduit la largeur
+        speedSelector.setPrototypeDisplayValue("1x");
         speedSelector.setMaximumSize(new Dimension(60, 25));
         speedSelector.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        
-
+    
         JLabel clockLabel = new JLabel("Horloge: 0");
-        clockLabel.setForeground(Color.white);
+        clockLabel.setForeground(Color.WHITE);
         JLabel statusLabel = new JLabel("Statut: Arrêté");
-        statusLabel.setForeground(Color.white);
+        statusLabel.setForeground(Color.WHITE);
         JLabel vitesse = new JLabel("Vitesse:");
-        vitesse.setForeground(Color.white);
-
-        // Assemblage final
-        menuBar.add(Box.createHorizontalGlue());
-        menuBar.add(centerPanel);
-        menuBar.add(Box.createHorizontalGlue());
+        vitesse.setForeground(Color.WHITE);
+    
         rightPanel.add(vitesse);
         rightPanel.add(speedSelector);
         rightPanel.add(Box.createHorizontalStrut(15));
         rightPanel.add(clockLabel);
         rightPanel.add(Box.createHorizontalStrut(5));
         rightPanel.add(statusLabel);
+    
+        // --------- Assemblage de la barre ---------
+    
+        menuBar.add(leftPanel);
+        menuBar.add(Box.createHorizontalGlue());
+        menuBar.add(centerPanel);
+        menuBar.add(Box.createHorizontalGlue());
         menuBar.add(rightPanel);
     
         // --------- Listeners ---------
@@ -254,36 +316,11 @@ public class Window {
             statusLabel.setText("Statut: En cours");
         });
     
-        pauseButton.addActionListener(e -> {
-            circuit.pause();
-            if (circuit.isPaused()) {
-                statusLabel.setText("Statut: En pause");
-            } else {
-                statusLabel.setText("Statut: Reprise");
-                try {
-                    circuit.simuler(); // Optionnel : relancer une simulation
-                    circuit.repaint();
-                } catch (CircuitInstableException ex) {
-                    JOptionPane.showMessageDialog(frame, "Circuit instable !", "Erreur", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        });
-        
-        resetButton.addActionListener(e -> {
-            int confirm = JOptionPane.showConfirmDialog(
-                frame,
-                "Voulez-vous vraiment tout effacer ?",
-                "Confirmation",
-                JOptionPane.YES_NO_OPTION
-            );
-            if (confirm == JOptionPane.YES_OPTION) {
-                circuit.clearAll();    
-                circuit.repaint();        
-                statusLabel.setText("Statut: Réinitialisé");
-            }
-        });
+        pauseButton.addActionListener(e -> statusLabel.setText("Statut: En pause"));
+        resetButton.addActionListener(e -> statusLabel.setText("Statut: Réinitialisé"));
         saveButton.addActionListener(e -> sauvegarderCircuit());
         openButton.addActionListener(e -> chargerCircuit());
+        //importComponentButton.addActionListener(e -> importComponent());
     
         return menuBar;
     }
@@ -298,29 +335,95 @@ public class Window {
         JButton btn = new JButton(iconText);
         btn.setFont(new Font("Arial Unicode MS", Font.PLAIN, 15)); // Taille de police augmentée
         btn.setToolTipText(tooltip);
-        btn.setBackground(Color.WHITE);
-        btn.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(200, 200, 200)),
-                BorderFactory.createEmptyBorder(4, 12, 4, 12)));
-
-        // Style hover
-        btn.addMouseListener(new MouseAdapter() {
-            public void mouseEntered(MouseEvent e) {
-                btn.setBackground(new Color(246, 246, 246));
-                btn.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(new Color(180, 180, 180)),
-                        BorderFactory.createEmptyBorder(4, 12, 4, 12)));
-
-            }
-
-            public void mouseExited(MouseEvent e) {
-                btn.setBackground(Color.WHITE);
-                btn.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(new Color(200, 200, 200)),
-                        BorderFactory.createEmptyBorder(4, 12, 4, 12)));
-            }
-        });
-
+        btn.setBackground(new Color(140,146,172));
+        
         return btn;
     }
+
+
+
+    private void sauvegarderCircuit() {
+    JFileChooser fileChooser = new JFileChooser();
+    fileChooser.setDialogTitle("Sauvegarder le circuit");
+
+    int userSelection = fileChooser.showSaveDialog(frame);
+
+    if (userSelection == JFileChooser.APPROVE_OPTION) {
+        try {
+            String donnees = circuit.exportAsText();
+            String chemin = fileChooser.getSelectedFile().getAbsolutePath();
+
+            //ajouter txt si aucune extention n'est donnée
+            if (!chemin.toLowerCase().endsWith(".txt")) {
+                chemin += ".txt";
+            }
+
+            FileWriter writer = new FileWriter(chemin);
+            writer.write(donnees);
+            writer.close();
+
+            JOptionPane.showMessageDialog(frame, "Circuit sauvegardé avec succès !", "Succès", JOptionPane.INFORMATION_MESSAGE);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(frame, "Erreur lors de la sauvegarde : " + e.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+}
+
+
+private void chargerCircuit() {
+    JFileChooser fileChooser = new JFileChooser();
+    fileChooser.setDialogTitle("Ouvrir un circuit");
+
+    int result = fileChooser.showOpenDialog(frame);
+    if (result == JFileChooser.APPROVE_OPTION) {
+        try {
+            File fichier = fileChooser.getSelectedFile();
+            circuit.importFromFile(fichier);
+            JOptionPane.showMessageDialog(frame, "Circuit chargé !");
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(frame, "Erreur lors du chargement : " + e.getMessage());
+        }
+    }
+}
+
+
+    /**
+     * 
+     */
+    private void showGuideDialog() {
+        JDialog dialog = new JDialog(frame, "Guide d'utilisation", true);
+        dialog.setSize(810, 600);
+        dialog.setLocationRelativeTo(frame);
+
+        JEditorPane editorPane = new JEditorPane();
+        editorPane.setEditable(false);
+        editorPane.setContentType("text/html");
+
+        try {
+            java.net.URL guideUrl = getClass().getResource("/guide/guide.html");
+
+            if (guideUrl != null) {
+                editorPane.setPage(guideUrl);
+
+            } else {
+                editorPane.setText("<h2>Guide non trouvé</h2>");
+
+            }
+        } catch (IOException e) {
+            editorPane.setText("<h2>Erreur de chargement du guide</h2>");
+        }
+
+        JScrollPane scrollPane = new JScrollPane(editorPane);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        dialog.add(scrollPane);
+        JButton closeButton = new JButton("Fermer");
+        closeButton.addActionListener(e -> dialog.dispose());
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(closeButton);
+        dialog.add(buttonPanel, BorderLayout.SOUTH);
+
+        dialog.setVisible(true);
+    }
+
 }
