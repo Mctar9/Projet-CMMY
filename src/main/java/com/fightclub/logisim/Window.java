@@ -1,17 +1,14 @@
 
 //import javax.print.DocFlavor.URL;
-import javax.swing.*;
 import java.awt.*;
-import javax.swing.border.*;
-import java.awt.event.MouseAdapter;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.net.URL;
-import java.io.IOException;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import javax.swing.*;
+import javax.swing.border.*;
 
 /**
  * Main GUI window for the Logic Circuit Designer.
@@ -25,7 +22,11 @@ public class Window {
      * Constructs the main application window and initializes all components.
      */
     public Window() {
+         
         frame = new JFrame("Logic Circuit Designer");
+
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        frame.setMinimumSize(new Dimension(800, 600));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(1200, 800);
         frame.getContentPane().setBackground(Color.WHITE); // zone princupal en fond blanc
@@ -33,7 +34,9 @@ public class Window {
 
         // Configuration du layout principal
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        splitPane.setDividerSize(3);
+        splitPane.setResizeWeight(0.2);  //redimensionnement
+        splitPane.setContinuousLayout(true);  //redessiner automatiquement
+        splitPane.setDividerSize(8);
         splitPane.setDividerLocation(200); // Largeur augmentée pour les images
 
         circuit = new Circuit();
@@ -51,6 +54,7 @@ public class Window {
      * Sets up keyboard shortcuts for the window (e.g., Ctrl+Q to quit).
      */
     private void setupShortcuts() {
+        // Action pour fermer l'application (Ctrl+Q)
         AbstractAction closeAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -58,11 +62,59 @@ public class Window {
                 System.exit(0);
             }
         };
-
+    
+        // Action pour le mode suppression 
+        AbstractAction deleteAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                circuit.enableDeletingMode();
+            }
+        };
+    
+        // Action pour relancer la dernier boutons appuyer si le souris est toujours dessus
+        AbstractAction spaceAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    circuit.simuler();
+                    circuit.repaint();
+                } catch (CircuitInstableException ex) {
+                    JOptionPane.showMessageDialog(frame, "Circuit instable !", "Erreur", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        };
+    
+        // Action pour le plein écran (F11)
+        AbstractAction fullscreenAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                boolean isFullscreen = (frame.getExtendedState() & JFrame.MAXIMIZED_BOTH) != 0;
+                frame.setExtendedState(isFullscreen ? JFrame.NORMAL : JFrame.MAXIMIZED_BOTH);
+            }
+        };
+    
+        // Configuration des raccourcis
         JRootPane rootPane = frame.getRootPane();
-        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("ctrl Q"), "closeAction");
-        rootPane.getActionMap().put("closeAction", closeAction);
+        InputMap inputMap = rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap actionMap = rootPane.getActionMap();
+    
+        // Fermeture
+        inputMap.put(KeyStroke.getKeyStroke("ctrl Q"), "closeAction");
+        actionMap.put("closeAction", closeAction);
+    
+        // Suppression
+        inputMap.put(KeyStroke.getKeyStroke("DELETE"), "deleteAction");
+        actionMap.put("deleteAction", deleteAction);
+    
+        
+        inputMap.put(KeyStroke.getKeyStroke("SPACE"), "spaceAction");
+        actionMap.put("spaceAction", spaceAction);
+    
+        // Plein écran
+        inputMap.put(KeyStroke.getKeyStroke("ctrl F"), "fullscreenAction");
+        actionMap.put("fullscreenAction", fullscreenAction);
 
+       
     }
 
     /**
@@ -146,34 +198,14 @@ public class Window {
     private JButton createButton(String type, String tooltip) {
         JButton btn = new JButton();
         btn.setToolTipText(tooltip);
-        btn.setBackground(new Color(50, 50, 50));
+        btn.setBackground(new Color(140,146,172));
         btn.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         btn.setPreferredSize(new Dimension(120, 80));
 
         // Fallback textuel
         btn.setText(type);
-        btn.setForeground(Color.WHITE);
+        btn.setForeground(Color.BLACK);
         btn.setFont(new Font("Segoe UI", Font.BOLD, 12));
-
-        // Effet hover
-        btn.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                btn.setBackground(new Color(65, 65, 65));
-                btn.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(new Color(100, 100, 100)),
-                        BorderFactory.createEmptyBorder(12, 12, 12, 12)));
-
-            }
-
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                btn.setBackground(new Color(50, 50, 50));
-                btn.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(new Color(80, 80, 80)),
-                        BorderFactory.createEmptyBorder(12, 12, 12, 12)));
-
-            }
-        });
-
         return btn;
     }
 
@@ -212,21 +244,12 @@ public class Window {
         // Bouton d'aide
         JButton helpButton = createToolButton("💡", "Guide d'utilisation");
         helpButton.setForeground(Color.YELLOW);
-        helpButton.setBackground(Color.BLACK);
         helpButton.addActionListener(e -> showGuideDialog());
     
         // Boutons enregistrer et importer
         JButton saveButton = createToolButton("💾", "Sauvegarder");
         JButton openButton = createToolButton("📁", "Ouvrir un circuit");
         JButton importComponentButton = createToolButton("IMPORTER COMPOSANT", "Ajouter un composant depuis un fichier");
-    
-        // Couleurs cohérentes
-        //saveButton.setForeground(Color.BLACK);
-        saveButton.setBackground(Color.CYAN);
-        openButton.setForeground(Color.BLACK);
-        openButton.setBackground(Color.white);
-        importComponentButton.setForeground(Color.BLACK);
-        importComponentButton.setBackground(Color.white);
     
         // Ajout au panneau de gauche
         leftPanel.add(helpButton);
@@ -312,29 +335,7 @@ public class Window {
         JButton btn = new JButton(iconText);
         btn.setFont(new Font("Arial Unicode MS", Font.PLAIN, 15)); // Taille de police augmentée
         btn.setToolTipText(tooltip);
-        btn.setBackground(Color.WHITE);
-        btn.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(200, 200, 200)),
-                BorderFactory.createEmptyBorder(4, 12, 4, 12)));
-
-        // Style hover
-        
-        btn.addMouseListener(new MouseAdapter() {
-            public void mouseEntered(MouseEvent e) {
-                btn.setBackground(new Color(246, 246, 246));
-                btn.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(new Color(180, 180, 180)),
-                        BorderFactory.createEmptyBorder(4, 12, 4, 12)));
-
-            }
-
-            public void mouseExited(MouseEvent e) {
-                btn.setBackground(Color.WHITE);
-                btn.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(new Color(200, 200, 200)),
-                        BorderFactory.createEmptyBorder(4, 12, 4, 12)));
-            }
-        });
+        btn.setBackground(new Color(140,146,172));
         
         return btn;
     }

@@ -29,16 +29,16 @@ public class LedLight extends MemoryComponent {
         } else if (getInputValue() == QuadBool.FALSE) {
             ledColor = Color.RED; // Gris foncé éteint
         } else {
-            ledColor = new Color(255, 165, 0); // Orange pour états spéciaux
+            ledColor = Color.BLACK  ; // Orange pour états spéciaux
         }
 
         // Corps de la LED
         g2d.setColor(ledColor);
-        g2d.fillOval(getX(), getY(), getWidth(), getHeight());
+        g2d.fillOval(getX(), getY(), getWidth()-20, getHeight());
 
         // Contour
         g2d.setColor(isSelected ? Color.BLUE : Color.BLACK);
-        g2d.drawOval(getX(), getY(), getWidth(), getHeight());
+        g2d.drawOval(getX(), getY(), getWidth()-20, getHeight());
 
         // Dessin des points de connexion
         drawConnectionPoints(g2d);

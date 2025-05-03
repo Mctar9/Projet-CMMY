@@ -41,18 +41,39 @@ public class OrGate extends MemoryComponent {
      * @author Riyad Derguini
      */
     @Override
-    public void initConnectionPoints() {
-        inputs = new ArrayList<ConnectionPoint>(2);
-        outputs = new ArrayList<ConnectionPoint>(1);
-
-        // Points de connexion d'entrée
-        inputs.add(new ConnectionPoint(this, getX(), getY() + getHeight() / 3, true));        // Première entrée (en haut à gauche)
-        inputs.add(new ConnectionPoint(this, getX(), getY() + 2 * getHeight() / 3, true));     // Deuxième entrée (en bas à gauche)
-
-        // Point de connexion de sortie
-        outputs.add(new ConnectionPoint(this, getX() + getWidth(), getY() + getHeight() / 2, false)); // Sortie au milieu à droite
-
-
+    protected void initConnectionPoints() {
+        inputs = new ArrayList<>(2);
+        outputs = new ArrayList<>(1);
+        
+        int margin = 3;
+        int w = getWidth();
+        int h = getHeight();
+        
+        switch(getRotationAngle()) {
+            case 0: // →
+                inputs.add(new ConnectionPoint(this, getX() - margin, getY() + h/4, true));
+                inputs.add(new ConnectionPoint(this, getX() - margin, getY() + 3*h/4, true));
+                outputs.add(new ConnectionPoint(this, getX() + w + margin, getY() + h/2, false));
+                break;
+                
+            case 90: // ↑
+                inputs.add(new ConnectionPoint(this, getX() + w/4, getY() - margin, true));
+                inputs.add(new ConnectionPoint(this, getX() + 3*w/4, getY() - margin, true));
+                outputs.add(new ConnectionPoint(this, getX() + w/2, getY() + h + margin, false));
+                break;
+                
+            case 180: // ←
+                inputs.add(new ConnectionPoint(this, getX() + w + margin, getY() + h/4, true));
+                inputs.add(new ConnectionPoint(this, getX() + w + margin, getY() + 3*h/4, true));
+                outputs.add(new ConnectionPoint(this, getX() - margin, getY() + h/2, false));
+                break;
+                
+            case 270: // ↓
+                inputs.add(new ConnectionPoint(this, getX() + w/4, getY() + h + margin, true));
+                inputs.add(new ConnectionPoint(this, getX() + 3*w/4, getY() + h + margin, true));
+                outputs.add(new ConnectionPoint(this, getX() + w/2, getY() - margin, false));
+                break;
+        }
     }
 
     /**

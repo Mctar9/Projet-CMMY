@@ -42,15 +42,35 @@ public class NotGate extends MemoryComponent {
      * @author Riyad Derguini
      */
     @Override
-    public void initConnectionPoints() {
+    protected void initConnectionPoints() {
         inputs = new ArrayList<>(1);
         outputs = new ArrayList<>(1);
-    
-        // Point de connexion d'entrée (au milieu à gauche)
-        inputs.add(new ConnectionPoint(this, getX(), getY() + getHeight() / 2, true));
-    
-        // Point de connexion de sortie (au milieu à droite)
-        outputs.add(new ConnectionPoint(this, getX() + getWidth(), getY() + getHeight() / 2, false));
+        
+        int margin = 5;
+        int w = getWidth();
+        int h = getHeight();
+        
+        switch(getRotationAngle()) {
+            case 0: // →
+                inputs.add(new ConnectionPoint(this, getX() - margin, getY() + h/2, true));
+                outputs.add(new ConnectionPoint(this, getX() + w + margin, getY() + h/2, false));
+                break;
+                
+            case 90: // ↑
+                inputs.add(new ConnectionPoint(this, getX() + w/2, getY() - margin, true));
+                outputs.add(new ConnectionPoint(this, getX() + w/2, getY() + h + margin, false));
+                break;
+                
+            case 180: // ←
+                inputs.add(new ConnectionPoint(this, getX() + w + margin, getY() + h/2, true));
+                outputs.add(new ConnectionPoint(this, getX() - margin, getY() + h/2, false));
+                break;
+                
+            case 270: // ↓
+                inputs.add(new ConnectionPoint(this, getX() + w/2, getY() + h + margin, true));
+                outputs.add(new ConnectionPoint(this, getX() + w/2, getY() - margin, false));
+                break;
+        }
     }
     
 

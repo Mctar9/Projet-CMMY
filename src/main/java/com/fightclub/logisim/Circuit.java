@@ -43,94 +43,106 @@ public class Circuit extends JPanel {
         setBackground(Color.WHITE);
         setFocusable(true);
         requestFocusInWindow();
-
+    
         components = new ArrayList<>();
         wires = new ArrayList<>();
-
         selectedComponent = null;
         wireStartPoint = null;
         currentMousePosition = null;
         addingComponent = false;
         deletingMode = false;
-
+    
         // Gestion des clics souris
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
+                requestFocusInWindow(); // Prendre le focus clavier
+                
                 if (addingComponent) {
                     addNewComponent(e);
                     addingComponent = false;
                     repaint();
                     return;
                 }
-            
+                
                 if (deletingMode) {
                     deleteComponentOrWire(e);
                     deletingMode = false;
                     return;
                 }
-            
-                // D'abord vérifier si on clique sur un point de connexion (pour les fils)
-                ConnectionPoint p = findConnectionPoint(e.getX(), e.getY());
-                if (p != null && !p.isInput()) {
-                    wireStartPoint = p;
+    
+                // 1. Vérifier d'abord les points de connexion
+                ConnectionPoint clickedPoint = findConnectionPoint(e.getX(), e.getY());
+                if (clickedPoint != null && !clickedPoint.isInput()) {
+                    wireStartPoint = clickedPoint;
                     currentMousePosition = e.getPoint();
-                } else {
-                    selectedComponent = getComponent(e.getX(), e.getY());
+                    return;
                 }
-            }      
-            
+    
+                // 2. Sinon, gérer la sélection de composant
+                selectedComponent = getComponent(e.getX(), e.getY());
+                repaint();
+            }
+    
             @Override
             public void mouseReleased(MouseEvent e) {
                 if (wireStartPoint != null) {
-                    ConnectionPoint target = findConnectionPoint(e.getX(), e.getY());
-                    if (target != null && target.isInput()) {
-                        Wire newWire = new Wire(wireStartPoint, target);
-                        wireStartPoint.connectWire(newWire);  // ← Connexion bidirectionnelle
-                        target.connectWire(newWire);          // ← Connexion bidirectionnelle
+                    ConnectionPoint endPoint = findConnectionPoint(e.getX(), e.getY());
+                    
+                    // Vérification simple ici
+                    if (endPoint != null && endPoint.isInput() && endPoint.canConnect()) {
+                        Wire newWire = new Wire(wireStartPoint, endPoint);
                         wires.add(newWire);
+                        wireStartPoint.connectWire(newWire);
+                        endPoint.connectWire(newWire);
                     }
+                    
                     wireStartPoint = null;
                     currentMousePosition = null;
                 }
                 repaint();
             }
         });
-
-        // Déplacement de la souris
+    
+        // Gestion du drag pour prévisualisation des fils
         addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
                 if (wireStartPoint != null) {
                     currentMousePosition = e.getPoint();
+                    repaint();
                 } else if (selectedComponent != null) {
                     selectedComponent.moveTo(e.getX(), e.getY());
+                    repaint();
                 }
-                repaint();
             }
         });
-
-        // Clavier (désactivé ici)
+    
+        // Raccourcis clavier pour déplacement
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (selectedComponent == null) return;
+    
+                int step = 20; 
                 
-                int step = 20; // Pas de déplacement
                 switch(e.getKeyCode()) {
-                    case KeyEvent.VK_LEFT:  
+                    case KeyEvent.VK_LEFT:
                         selectedComponent.move(-step, 0);
                         break;
-                    case KeyEvent.VK_RIGHT: 
+                    case KeyEvent.VK_RIGHT:
                         selectedComponent.move(step, 0);
                         break;
-                    case KeyEvent.VK_UP:    
-                        selectedComponent.move(0,step);
+                    case KeyEvent.VK_UP:
+                        selectedComponent.move(0, -step);
                         break;
-                    case KeyEvent.VK_DOWN:  
-                        selectedComponent.move(0,-step);
+                    case KeyEvent.VK_DOWN:
+                        selectedComponent.move(0, step);
                         break;
-                    case KeyEvent.VK_R:     
+                    case KeyEvent.VK_ESCAPE:
+                        selectedComponent = null; // Désélection
+                        break;
+                    case KeyEvent.VK_R: // Rotation avec la touche R
                         selectedComponent.rotate();
                         break;
                 }

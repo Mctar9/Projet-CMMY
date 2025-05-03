@@ -43,16 +43,36 @@ public class AndGate extends MemoryComponent {
      * @author Riyad Derguini
      */
     @Override
-    public void initConnectionPoints() {
-        inputs = new ArrayList<ConnectionPoint>(2);
-        outputs = new ArrayList<ConnectionPoint>(1);
-
-        // Points de connexion d'entrée
-        inputs.add(new ConnectionPoint(this, getX(), getY() + getHeight() / 3, true));        // Première entrée (en haut à gauche)
-        inputs.add(new ConnectionPoint(this, getX(), getY() + 2 * getHeight() / 3, true));     // Deuxième entrée (en bas à gauche)
-
-        // Point de connexion de sortie
-        outputs.add(new ConnectionPoint(this, getX() + getWidth(), getY() + getHeight() / 2, false)); // Sortie au milieu à droite
+    protected void initConnectionPoints() {
+        inputs = new ArrayList<>(2);
+        outputs = new ArrayList<>(1);
+        
+        // Positions de base (0 degré)
+        int baseX = getX();
+        int baseY = getY();
+        
+        switch(getRotationAngle()) {
+            case 0:
+                inputs.add(new ConnectionPoint(this, baseX, baseY + getHeight()/3, true));
+                inputs.add(new ConnectionPoint(this, baseX, baseY + 2*getHeight()/3, true));
+                outputs.add(new ConnectionPoint(this, baseX + getWidth(), baseY + getHeight()/2, false));
+                break;
+            case 90:
+                inputs.add(new ConnectionPoint(this, baseX + getWidth()/3, baseY, true));
+                inputs.add(new ConnectionPoint(this, baseX + 2*getWidth()/3, baseY, true));
+                outputs.add(new ConnectionPoint(this, baseX + getWidth()/2, baseY + getHeight(), false));
+                break;
+            case 180:
+                inputs.add(new ConnectionPoint(this, baseX + getWidth(), baseY + getHeight()/3, true));
+                inputs.add(new ConnectionPoint(this, baseX + getWidth(), baseY + 2*getHeight()/3, true));
+                outputs.add(new ConnectionPoint(this, baseX, baseY + getHeight()/2, false));
+                break;
+            case 270:
+                inputs.add(new ConnectionPoint(this, baseX + getWidth()/3, baseY + getHeight(), true));
+                inputs.add(new ConnectionPoint(this, baseX + 2*getWidth()/3, baseY + getHeight(), true));
+                outputs.add(new ConnectionPoint(this, baseX + getWidth()/2, baseY, false));
+                break;
+        }
     }
 
     /**
