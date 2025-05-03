@@ -1,3 +1,4 @@
+package com.fightclub.logisim;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
@@ -36,9 +37,23 @@ public class ConstantComponent extends MemoryComponent {
      */
     @Override
     protected void initConnectionPoints() {
-        outputs.clear();
-        // Une seule sortie centrée à droite
-        outputs.add(new ConnectionPoint(this, getX() + getWidth(), getY() + getHeight()/2, false));
+        outputs = new ArrayList<>(1);
+        int margin = 5;
+        
+        switch(getRotationAngle()) {
+            case 0: // →
+                outputs.add(new ConnectionPoint(this, getX() + getWidth() + margin, getY() + getHeight()/2, false));
+                break;
+            case 90: // ↑
+                outputs.add(new ConnectionPoint(this, getX() + getWidth()/2, getY() - margin, false));
+                break;
+            case 180: // ←
+                outputs.add(new ConnectionPoint(this, getX() - margin, getY() + getHeight()/2, false));
+                break;
+            case 270: // ↓
+                outputs.add(new ConnectionPoint(this, getX() + getWidth()/2, getY() + getHeight() + margin, false));
+                break;
+        }
     }
 
     /**

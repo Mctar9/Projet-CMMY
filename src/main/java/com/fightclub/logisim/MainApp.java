@@ -1,3 +1,4 @@
+package com.fightclub.logisim;
 import javax.swing.SwingUtilities;
 
 /**

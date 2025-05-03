@@ -1,3 +1,5 @@
+package com.fightclub.logisim;
+
 import java.awt.*;
 import java.util.ArrayList;
 
@@ -25,20 +27,22 @@ public class LedLight extends MemoryComponent {
         // Couleur basée sur QuadBool
         Color ledColor;
         if (getInputValue() == QuadBool.TRUE) {
-            ledColor = Color.GREEN; // Vert vif allumé
+            ledColor = Color.YELLOW; // Vert vif allumé
         } else if (getInputValue() == QuadBool.FALSE) {
-            ledColor = Color.RED; // Gris foncé éteint
+            ledColor = Color.BLACK; // Gris foncé éteint
         } else {
-            ledColor = new Color(255, 165, 0); // Orange pour états spéciaux
+            ledColor = Color.GRAY  ; // Orange pour états spéciaux
         }
 
         // Corps de la LED
         g2d.setColor(ledColor);
-        g2d.fillOval(getX(), getY(), getWidth(), getHeight());
+        g2d.fillOval(getX(), getY(), getWidth()-20, getHeight());
+
+
 
         // Contour
         g2d.setColor(isSelected ? Color.BLUE : Color.BLACK);
-        g2d.drawOval(getX(), getY(), getWidth(), getHeight());
+        g2d.drawOval(getX(), getY(), getWidth()-20, getHeight());
 
         // Dessin des points de connexion
         drawConnectionPoints(g2d);
@@ -53,7 +57,7 @@ public class LedLight extends MemoryComponent {
 
     @Override
     public void compute() {
-        // TODO Auto-generated method stub
+        // pas de compute pou le led
         throw new UnsupportedOperationException("Unimplemented method 'compute'");
     }
 }

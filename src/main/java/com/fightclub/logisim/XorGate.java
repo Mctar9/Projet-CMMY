@@ -1,3 +1,4 @@
+package com.fightclub.logisim;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
@@ -36,16 +37,39 @@ public class XorGate extends MemoryComponent {
 
 
     @Override
-    public void initConnectionPoints() {
+    protected void initConnectionPoints() {
         inputs = new ArrayList<>(2);
         outputs = new ArrayList<>(1);
-
-        // Points de connexion d'entrée
-        inputs.add(new ConnectionPoint(this, getX(), getY() + getHeight() / 3, true));        // Première entrée (en haut à gauche)
-        inputs.add(new ConnectionPoint(this, getX(), getY() + 2 * getHeight() / 3, true));     // Deuxième entrée (en bas à gauche)
-
-        // Point de connexion de sortie
-        outputs.add(new ConnectionPoint(this, getX() + getWidth(), getY() + getHeight() / 2, false)); // Sortie au milieu à droite
+        
+        int margin = 5; // Décalage extérieur
+        int w = getWidth();
+        int h = getHeight();
+        
+        switch(getRotationAngle()) {
+            case 0: // Horizontal →
+                inputs.add(new ConnectionPoint(this, getX() - margin, getY() + h/3, true));
+                inputs.add(new ConnectionPoint(this, getX() - margin, getY() + 2*h/3, true));
+                outputs.add(new ConnectionPoint(this, getX() + w + margin, getY() + h/2, false));
+                break;
+                
+            case 90: // Haut ↑
+                inputs.add(new ConnectionPoint(this, getX() + w/3, getY() - margin, true));
+                inputs.add(new ConnectionPoint(this, getX() + 2*w/3, getY() - margin, true));
+                outputs.add(new ConnectionPoint(this, getX() + w/2, getY() + h + margin, false));
+                break;
+                
+            case 180: // Gauche ←
+                inputs.add(new ConnectionPoint(this, getX() + w + margin, getY() + h/3, true));
+                inputs.add(new ConnectionPoint(this, getX() + w + margin, getY() + 2*h/3, true));
+                outputs.add(new ConnectionPoint(this, getX() - margin, getY() + h/2, false));
+                break;
+                
+            case 270: // Bas ↓
+                inputs.add(new ConnectionPoint(this, getX() + w/3, getY() + h + margin, true));
+                inputs.add(new ConnectionPoint(this, getX() + 2*w/3, getY() + h + margin, true));
+                outputs.add(new ConnectionPoint(this, getX() + w/2, getY() - margin, false));
+                break;
+        }
     }
 
     /**

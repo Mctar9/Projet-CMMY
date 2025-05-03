@@ -1,3 +1,4 @@
+package com.fightclub.logisim;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -144,6 +145,12 @@ public abstract class MemoryComponent {
     public void move(int dx, int dy) {
         this.x += dx;
         this.y += dy;
+        for (ConnectionPoint point : inputs) {
+            point.move(dx, dy);
+        }
+        for (ConnectionPoint point : outputs) {
+            point.move(dx, dy);
+        }
     }
 
     /**
@@ -163,6 +170,8 @@ public abstract class MemoryComponent {
      */
     public void rotate() {
         rotationAngle = (rotationAngle + 90) % 360;
+        // Réinitialiser les points de connexion après rotation
+        initConnectionPoints();
     }
 
     /**

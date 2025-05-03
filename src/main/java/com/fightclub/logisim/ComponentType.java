@@ -1,3 +1,5 @@
+package com.fightclub.logisim;
+
 /**
  * Cette classe représente les types de composants logiques.
  * Elle est utilisée pour identifier le type de logique (ET, OU, NON, etc.)
