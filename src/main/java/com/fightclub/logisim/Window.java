@@ -1,4 +1,4 @@
-
+package com.fightclub.logisim;
 //import javax.print.DocFlavor.URL;
 import java.awt.*;
 import java.awt.event.ActionEvent;

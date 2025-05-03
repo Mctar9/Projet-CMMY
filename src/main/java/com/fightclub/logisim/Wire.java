@@ -155,16 +155,16 @@ public class Wire {
         g2d.setStroke(new BasicStroke(3));
         
         switch (value) {
-            case QuadBool.TRUE:
+            case TRUE:
                 g2d.setColor(new Color(0, 200, 0)); // Vert pour TRUE
                 break;
-            case QuadBool.FALSE:
+            case FALSE:
                 g2d.setColor(new Color(200, 0, 0)); // Rouge pour FALSE
                 break;
-            case QuadBool.ERR:
+            case ERR:
                 g2d.setColor(new Color(150, 0, 150)); // Violet pour ERR
                 break;
-            case QuadBool.NOTHING:
+            case NOTHING:
             default:
                 g2d.setColor(new Color(100, 100, 100)); // Gris pour NOTHING
                 break;
