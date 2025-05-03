@@ -31,7 +31,7 @@ public class Circuit extends JPanel {
     private boolean addingComponent;
     private boolean deletingMode;
     private String addingComponentType;
-    private boolean paused = false;
+    private boolean paused = true;
 
 
     // --------------Constructeur--------------//
@@ -59,7 +59,11 @@ public class Circuit extends JPanel {
             @Override
             public void mousePressed(MouseEvent e) {
                 requestFocusInWindow(); // Prendre le focus clavier
-                
+
+                if (!isEditable()) {
+                    JOptionPane.showMessageDialog(new JPanel(),"Impossible de modifier le circuit pendant la simulation.");
+                    return;
+                }
                 if (addingComponent) {
                     addNewComponent(e);
                     addingComponent = false;
@@ -310,7 +314,10 @@ public class Circuit extends JPanel {
     public boolean isPaused() {
         return paused;
     }
-    
+    public boolean isEditable() {
+        return paused;
+    }
+        
     public void clearAll() {
         components.clear();
         wires.clear();
