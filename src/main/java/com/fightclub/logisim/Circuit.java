@@ -169,6 +169,7 @@ public class Circuit extends JPanel {
             for (Wire w : wires) {
                 if (w.isConnectedTo(component)) {
                     toRemove.add(w);
+                    w.getEnd().setWire(null);
                 }
             }
             wires.removeAll(toRemove);
@@ -177,6 +178,7 @@ public class Circuit extends JPanel {
             Wire wire = getWireAt(e.getX(), e.getY());
             if (wire != null)
                 wires.remove(wire);
+                wire.getEnd().setWire(null);
         }
         repaint();
     }
