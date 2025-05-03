@@ -1,17 +1,14 @@
 
 //import javax.print.DocFlavor.URL;
-import javax.swing.*;
 import java.awt.*;
-import javax.swing.border.*;
-import java.awt.event.MouseAdapter;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.net.URL;
-import java.io.IOException;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import javax.swing.*;
+import javax.swing.border.*;
 
 /**
  * Main GUI window for the Logic Circuit Designer.
@@ -25,7 +22,11 @@ public class Window {
      * Constructs the main application window and initializes all components.
      */
     public Window() {
+         
         frame = new JFrame("Logic Circuit Designer");
+
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        frame.setMinimumSize(new Dimension(800, 600));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(1200, 800);
         frame.getContentPane().setBackground(Color.WHITE); // zone princupal en fond blanc
@@ -33,7 +34,9 @@ public class Window {
 
         // Configuration du layout principal
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        splitPane.setDividerSize(3);
+        splitPane.setResizeWeight(0.2);  //redimensionnement
+        splitPane.setContinuousLayout(true);  //redessiner automatiquement
+        splitPane.setDividerSize(8);
         splitPane.setDividerLocation(200); // Largeur augmentée pour les images
 
         circuit = new Circuit();
@@ -51,6 +54,7 @@ public class Window {
      * Sets up keyboard shortcuts for the window (e.g., Ctrl+Q to quit).
      */
     private void setupShortcuts() {
+        // Action pour fermer l'application (Ctrl+Q)
         AbstractAction closeAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -58,11 +62,59 @@ public class Window {
                 System.exit(0);
             }
         };
-
+    
+        // Action pour le mode suppression 
+        AbstractAction deleteAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                circuit.enableDeletingMode();
+            }
+        };
+    
+        // Action pour relancer la dernier boutons appuyer si le souris est toujours dessus
+        AbstractAction spaceAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    circuit.simuler();
+                    circuit.repaint();
+                } catch (CircuitInstableException ex) {
+                    JOptionPane.showMessageDialog(frame, "Circuit instable !", "Erreur", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        };
+    
+        // Action pour le plein écran (F11)
+        AbstractAction fullscreenAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                boolean isFullscreen = (frame.getExtendedState() & JFrame.MAXIMIZED_BOTH) != 0;
+                frame.setExtendedState(isFullscreen ? JFrame.NORMAL : JFrame.MAXIMIZED_BOTH);
+            }
+        };
+    
+        // Configuration des raccourcis
         JRootPane rootPane = frame.getRootPane();
-        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("ctrl Q"), "closeAction");
-        rootPane.getActionMap().put("closeAction", closeAction);
+        InputMap inputMap = rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap actionMap = rootPane.getActionMap();
+    
+        // Fermeture
+        inputMap.put(KeyStroke.getKeyStroke("ctrl Q"), "closeAction");
+        actionMap.put("closeAction", closeAction);
+    
+        // Suppression
+        inputMap.put(KeyStroke.getKeyStroke("DELETE"), "deleteAction");
+        actionMap.put("deleteAction", deleteAction);
+    
+        
+        inputMap.put(KeyStroke.getKeyStroke("SPACE"), "spaceAction");
+        actionMap.put("spaceAction", spaceAction);
+    
+        // Plein écran
+        inputMap.put(KeyStroke.getKeyStroke("ctrl F"), "fullscreenAction");
+        actionMap.put("fullscreenAction", fullscreenAction);
 
+       
     }
 
     /**
