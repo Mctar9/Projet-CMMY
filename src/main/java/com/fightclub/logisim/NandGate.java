@@ -39,25 +39,39 @@ public class NandGate extends MemoryComponent {
      * @author Riyad Derguini
      */
     @Override
-    public void initConnectionPoints() {
-        if (inputs == null) {
-            inputs = new ArrayList<>(2);
-        } else {
-            inputs.clear();
+    protected void initConnectionPoints() {
+        inputs = new ArrayList<>(2);
+        outputs = new ArrayList<>(1);
+        
+        int margin = 2;
+        int w = getWidth();
+        int h = getHeight();
+        
+        switch(getRotationAngle()) {
+            case 0: // →
+                inputs.add(new ConnectionPoint(this, getX() - margin, getY() + h/3, true));
+                inputs.add(new ConnectionPoint(this, getX() - margin, getY() + 2*h/3, true));
+                outputs.add(new ConnectionPoint(this, getX() + w + margin, getY() + h/2, false));
+                break;
+                
+            case 90: // ↑
+                inputs.add(new ConnectionPoint(this, getX() + w/3, getY() - margin, true));
+                inputs.add(new ConnectionPoint(this, getX() + 2*w/3, getY() - margin, true));
+                outputs.add(new ConnectionPoint(this, getX() + w/2, getY() + h , false));
+                break;
+                
+            case 180: // ←
+                inputs.add(new ConnectionPoint(this, getX() + w + margin, getY() + h/3, true));
+                inputs.add(new ConnectionPoint(this, getX() + w + margin, getY() + 2*h/3, true));
+                outputs.add(new ConnectionPoint(this, getX() - margin, getY() + h/2, false));
+                break;
+                
+            case 270: // ↓
+                inputs.add(new ConnectionPoint(this, getX() + w/3, getY() + h + margin, true));
+                inputs.add(new ConnectionPoint(this, getX() + 2*w/3, getY() + h + margin, true));
+                outputs.add(new ConnectionPoint(this, getX() + w/2, getY() - margin, false));
+                break;
         }
-    
-        if (outputs == null) {
-            outputs = new ArrayList<>(1);
-        } else {
-            outputs.clear();
-        }
-    
-        // Points de connexion d'entrée (basés sur x et y réels)
-        inputs.add(new ConnectionPoint(this, getX(), getY() + getHeight() / 3, true));
-        inputs.add(new ConnectionPoint(this, getX(), getY() + 2 * getHeight() / 3, true));
-    
-        // Point de connexion de sortie
-        outputs.add(new ConnectionPoint(this, getX() + getWidth(), getY() + getHeight() / 2, false));
     }
     
 

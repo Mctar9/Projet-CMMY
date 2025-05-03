@@ -170,11 +170,15 @@ public class ConnectionPoint {
     }
 
     public void connectWire(Wire wire) {
-        this.connectedWire = wire;
-        if (isInput()) {
-            wire.setEnd(this);  // Pour les points d'entrée
-        } else {
-            wire.setStart(this); // Pour les points de sortie
+        // Laissez l'existant mais ajoutez:
+        if (isInput() && this.connectedWire != null) {
+            throw new IllegalStateException("Déjà connecté");
         }
+        this.connectedWire = wire;
+    }
+    
+    public boolean canConnect() {
+        // Pour les entrées: max 1 fil, pour les sorties: pas de limite
+        return !isInput() || getWire() == null;
     }
 }

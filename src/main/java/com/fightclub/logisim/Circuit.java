@@ -88,16 +88,19 @@ public class Circuit extends JPanel {
             public void mouseReleased(MouseEvent e) {
                 if (wireStartPoint != null) {
                     ConnectionPoint endPoint = findConnectionPoint(e.getX(), e.getY());
-                    if (endPoint != null && endPoint.isInput()) {
+                    
+                    // Vérification simple ici
+                    if (endPoint != null && endPoint.isInput() && endPoint.canConnect()) {
                         Wire newWire = new Wire(wireStartPoint, endPoint);
+                        wires.add(newWire);
                         wireStartPoint.connectWire(newWire);
                         endPoint.connectWire(newWire);
-                        wires.add(newWire);
                     }
+                    
                     wireStartPoint = null;
                     currentMousePosition = null;
-                    repaint();
                 }
+                repaint();
             }
         });
     
@@ -138,6 +141,9 @@ public class Circuit extends JPanel {
                         break;
                     case KeyEvent.VK_ESCAPE:
                         selectedComponent = null; // Désélection
+                        break;
+                    case KeyEvent.VK_R: // Rotation avec la touche R
+                        selectedComponent.rotate();
                         break;
                 }
                 repaint();

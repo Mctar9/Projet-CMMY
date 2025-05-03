@@ -198,34 +198,14 @@ public class Window {
     private JButton createButton(String type, String tooltip) {
         JButton btn = new JButton();
         btn.setToolTipText(tooltip);
-        btn.setBackground(new Color(50, 50, 50));
+        btn.setBackground(new Color(140,146,172));
         btn.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         btn.setPreferredSize(new Dimension(120, 80));
 
         // Fallback textuel
         btn.setText(type);
-        btn.setForeground(Color.WHITE);
+        btn.setForeground(Color.BLACK);
         btn.setFont(new Font("Segoe UI", Font.BOLD, 12));
-
-        // Effet hover
-        btn.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                btn.setBackground(new Color(65, 65, 65));
-                btn.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(new Color(100, 100, 100)),
-                        BorderFactory.createEmptyBorder(12, 12, 12, 12)));
-
-            }
-
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                btn.setBackground(new Color(50, 50, 50));
-                btn.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(new Color(80, 80, 80)),
-                        BorderFactory.createEmptyBorder(12, 12, 12, 12)));
-
-            }
-        });
-
         return btn;
     }
 
@@ -264,21 +244,12 @@ public class Window {
         // Bouton d'aide
         JButton helpButton = createToolButton("💡", "Guide d'utilisation");
         helpButton.setForeground(Color.YELLOW);
-        helpButton.setBackground(Color.BLACK);
         helpButton.addActionListener(e -> showGuideDialog());
     
         // Boutons enregistrer et importer
         JButton saveButton = createToolButton("💾", "Sauvegarder");
         JButton openButton = createToolButton("📁", "Ouvrir un circuit");
         JButton importComponentButton = createToolButton("IMPORTER COMPOSANT", "Ajouter un composant depuis un fichier");
-    
-        // Couleurs cohérentes
-        //saveButton.setForeground(Color.BLACK);
-        saveButton.setBackground(Color.CYAN);
-        openButton.setForeground(Color.BLACK);
-        openButton.setBackground(Color.white);
-        importComponentButton.setForeground(Color.BLACK);
-        importComponentButton.setBackground(Color.white);
     
         // Ajout au panneau de gauche
         leftPanel.add(helpButton);
@@ -364,29 +335,7 @@ public class Window {
         JButton btn = new JButton(iconText);
         btn.setFont(new Font("Arial Unicode MS", Font.PLAIN, 15)); // Taille de police augmentée
         btn.setToolTipText(tooltip);
-        btn.setBackground(Color.WHITE);
-        btn.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(200, 200, 200)),
-                BorderFactory.createEmptyBorder(4, 12, 4, 12)));
-
-        // Style hover
-        
-        btn.addMouseListener(new MouseAdapter() {
-            public void mouseEntered(MouseEvent e) {
-                btn.setBackground(new Color(246, 246, 246));
-                btn.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(new Color(180, 180, 180)),
-                        BorderFactory.createEmptyBorder(4, 12, 4, 12)));
-
-            }
-
-            public void mouseExited(MouseEvent e) {
-                btn.setBackground(Color.WHITE);
-                btn.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(new Color(200, 200, 200)),
-                        BorderFactory.createEmptyBorder(4, 12, 4, 12)));
-            }
-        });
+        btn.setBackground(new Color(140,146,172));
         
         return btn;
     }
