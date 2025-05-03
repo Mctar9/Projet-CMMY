@@ -31,6 +31,8 @@ public class Circuit extends JPanel {
     private boolean addingComponent;
     private boolean deletingMode;
     private String addingComponentType;
+    private boolean paused = false;
+
 
     // --------------Constructeur--------------//
 
@@ -299,6 +301,23 @@ public class Circuit extends JPanel {
                     currentMousePosition.x, currentMousePosition.y);
         }
     }
+    public void pause() {
+        paused = !paused;
+    }
+    
+    public boolean isPaused() {
+        return paused;
+    }
+    public void clearAll() {
+        components.clear();
+        wires.clear();
+        selectedComponent = null;
+        wireStartPoint = null;
+        currentMousePosition = null;
+        repaint();
+    }
+    
+    
 
     // ------------------last ver simuler-----------------//
     /**
@@ -306,6 +325,7 @@ public class Circuit extends JPanel {
  * @throws CircuitInstableException si la simulation ne converge pas
  */
 public void simuler() throws CircuitInstableException {
+    if (paused) return; // Ne rien faire si en pause
     // 1. Initialisation
     for (Wire fil : wires) {
         fil.setValue(QuadBool.NOTHING);
