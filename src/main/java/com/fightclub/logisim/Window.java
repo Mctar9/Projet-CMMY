@@ -84,7 +84,7 @@ public class Window {
         }
     };
 
-    // Action pour le plein écran (F11)
+    // Action pour le plein écran (ctrl F)
     AbstractAction fullscreenAction = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
