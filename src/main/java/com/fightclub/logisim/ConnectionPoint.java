@@ -16,7 +16,7 @@ public class ConnectionPoint {
     private boolean isInput; // vrai si c'est une entrée, faux si c'est une sortie
     private boolean highlighted = false; // vrai si le point est surligné
     private MemoryComponent parent; // Composant parent auquel ce point est relié
-    private Wire connectedWire; 
+    private Wire connectedWire;
 
     // -------------- CONSTRUCTEURS --------------//
 
@@ -180,5 +180,10 @@ public class ConnectionPoint {
     public boolean canConnect() {
         // Pour les entrées: max 1 fil, pour les sorties: pas de limite
         return !isInput() || getWire() == null;
+    }
+
+    public void setValue(QuadBool nothing) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setValue'");
     }
 }
