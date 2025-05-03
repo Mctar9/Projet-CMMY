@@ -1,3 +1,4 @@
+package com.fightclub.logisim;
 /**
  * Enumération QuadBool représentant une logique à quatre valeurs :
  * NOTHING (absence d'information), FALSE, TRUE, et ERR (erreur/contradiction).

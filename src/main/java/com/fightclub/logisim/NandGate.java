@@ -1,3 +1,4 @@
+package com.fightclub.logisim;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;

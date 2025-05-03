@@ -1,3 +1,5 @@
+package com.fightclub.logisim;
+
 import java.awt.*;
 import java.util.ArrayList;
 

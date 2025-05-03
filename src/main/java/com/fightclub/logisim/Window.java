@@ -177,7 +177,7 @@ public class Window {
         section.add(separator);
         section.add(Box.createVerticalStrut(10));
 
-        // Boutons avec images
+        // Boutons
         for (String[] item : items) {
             JButton btn = createButton(item[0], item[1]);
             btn.addActionListener(e -> handleButtonAction(item[0])); // Envoyer le type directement
@@ -196,18 +196,21 @@ public class Window {
      * @return The configured JButton
      */
     private JButton createButton(String type, String tooltip) {
-        JButton btn = new JButton();
+        JButton btn = new JButton(type);
         btn.setToolTipText(tooltip);
-        btn.setBackground(new Color(140,146,172));
+        btn.setBackground(new Color(140, 146, 172));
         btn.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        btn.setPreferredSize(new Dimension(120, 80));
-
-        // Fallback textuel
-        btn.setText(type);
+        
+        Dimension fixedSize = new Dimension(100, 70); // largeur et hauteur communes
+        btn.setPreferredSize(fixedSize);
+        btn.setMinimumSize(fixedSize);
+        btn.setMaximumSize(fixedSize);
+        
         btn.setForeground(Color.BLACK);
         btn.setFont(new Font("Segoe UI", Font.BOLD, 12));
         return btn;
     }
+    
 
     /**
      * Handles the logic for each sidebar button based on its command.
@@ -242,13 +245,13 @@ public class Window {
         leftPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 2));
     
         // Bouton d'aide
-        JButton helpButton = createToolButton("💡", "Guide d'utilisation");
-        helpButton.setForeground(Color.YELLOW);
+        JButton helpButton = createToolButton("Help", "Guide d'utilisation");
+        helpButton.setForeground(Color.BLACK);
         helpButton.addActionListener(e -> showGuideDialog());
     
         // Boutons enregistrer et importer
-        JButton saveButton = createToolButton("💾", "Sauvegarder");
-        JButton openButton = createToolButton("📁", "Ouvrir un circuit");
+        JButton saveButton = createToolButton("Enregistrer", "Sauvegarder");
+        JButton openButton = createToolButton("Importer", "Ouvrir un circuit");
         JButton importComponentButton = createToolButton("IMPORTER COMPOSANT", "Ajouter un composant depuis un fichier");
     
         // Ajout au panneau de gauche
