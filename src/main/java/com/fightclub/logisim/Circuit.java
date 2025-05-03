@@ -308,7 +308,10 @@ public class Circuit extends JPanel {
     public boolean isPaused() {
         return paused;
     }
-    
+    public boolean isEditable() {
+        return paused;
+    }
+        
     public void clearAll() {
         components.clear();
         wires.clear();
