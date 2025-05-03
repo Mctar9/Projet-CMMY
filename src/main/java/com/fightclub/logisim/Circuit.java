@@ -301,13 +301,14 @@ public class Circuit extends JPanel {
                     currentMousePosition.x, currentMousePosition.y);
         }
     }
-    public void pause() {
-        paused = !paused;
+    public void setPaused(boolean value) {
+        this.paused = value;
     }
     
     public boolean isPaused() {
         return paused;
     }
+    
     public void clearAll() {
         components.clear();
         wires.clear();
