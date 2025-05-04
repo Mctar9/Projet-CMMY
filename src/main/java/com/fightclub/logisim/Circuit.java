@@ -438,7 +438,7 @@ public void simuler() throws CircuitInstableException {
                     case "NotGate" -> new NotGate(id, x, y, null);
                     case "XorGate" -> new XorGate(id, x, y, null, null);
                     case "NandGate" -> new NandGate(id, x, y, null, null);
-                    case "ConstantComponent" -> new ConstantComponent(id, QuadBool.FALSE, x, y); // TODO: gérer valeur
+                    case "ConstantComponent" -> new ConstantComponent(id, QuadBool.FALSE, x, y);
                     default -> null;
                 };
 
@@ -459,7 +459,10 @@ public void simuler() throws CircuitInstableException {
                 ConnectionPoint src = idMap.get(fromId).getOutputs().get(fromIndex);
                 ConnectionPoint dst = idMap.get(toId).getInputs().get(toIndex);
 
-                wires.add(new Wire(src, dst));
+                Wire wire = new Wire(src, dst);
+                src.connectWire(wire);
+                dst.connectWire(wire);
+                wires.add(wire);
             }
         }
 
