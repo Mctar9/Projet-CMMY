@@ -385,20 +385,27 @@ public void simuler() throws CircuitInstableException {
 
     ////////////////////////////////////////////////////////////////////////////
 
+
+
+
     public String exportAsText() {
         StringBuilder sb = new StringBuilder();
 
-        // Exporter les composants
         for (MemoryComponent comp : components) {
             sb.append("Composant:");
             sb.append(" type=").append(comp.getClass().getSimpleName());
             sb.append(" id=").append(comp.getId());
             sb.append(" x=").append(comp.getX());
             sb.append(" y=").append(comp.getY());
+
+            // Exporter valeur si ConstantComponent
+            if (comp instanceof ConstantComponent constant) {
+                sb.append(" value=").append(constant.getOutputValue());
+            }
+
             sb.append("\n");
         }
 
-        // Exporter les connexions (fils)
         for (Wire wire : wires) {
             MemoryComponent fromComp = wire.getStart().getParentComponent();
             MemoryComponent toComp = wire.getEnd().getParentComponent();
@@ -432,20 +439,32 @@ public void simuler() throws CircuitInstableException {
                 int x = Integer.parseInt(parts[3].split("=")[1]);
                 int y = Integer.parseInt(parts[4].split("=")[1]);
 
-                MemoryComponent comp = switch (type) {
-                    case "AndGate" -> new AndGate(id, x, y, null, null);
-                    case "OrGate" -> new OrGate(id, x, y, null, null);
-                    case "NotGate" -> new NotGate(id, x, y, null);
-                    case "XorGate" -> new XorGate(id, x, y, null, null);
-                    case "NandGate" -> new NandGate(id, x, y, null, null);
-                    case "ConstantComponent" -> new ConstantComponent(id, QuadBool.FALSE, x, y);
-                    default -> null;
-                };
+                MemoryComponent comp = null;
+
+                switch (type) {
+                    case "AndGate" -> comp = new AndGate(id, x, y, null, null);
+                    case "OrGate" -> comp = new OrGate(id, x, y, null, null);
+                    case "NotGate" -> comp = new NotGate(id, x, y, null);
+                    case "XorGate" -> comp = new XorGate(id, x, y, null, null);
+                    case "NandGate" -> comp = new NandGate(id, x, y, null, null);
+                    case "LedLight" -> comp = new LedLight(id, x, y);
+                    case "ConstantComponent" -> {
+                        QuadBool val = QuadBool.FALSE;
+                        // Lire la valeur si elle est présente
+                        for (String part : parts) {
+                            if (part.startsWith("value=")) {
+                                val = QuadBool.valueOf(part.split("=")[1]);
+                            }
+                        }
+                        comp = new ConstantComponent(id, val, x, y);
+                    }
+                }
 
                 if (comp != null) {
                     idMap.put(id, comp);
                     components.add(comp);
                 }
+
             } else if (ligne.startsWith("Connexion:")) {
                 String[] parts = ligne.split(" ");
                 String from = parts[1].split("=")[1];
