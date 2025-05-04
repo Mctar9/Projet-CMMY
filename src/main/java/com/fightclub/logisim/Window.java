@@ -2,8 +2,6 @@ package com.fightclub.logisim;
 //import javax.print.DocFlavor.URL;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -40,9 +38,8 @@ public class Window {
         splitPane.setDividerLocation(200); // Largeur augmentée pour les images
 
         circuit = new Circuit();
-        JPanel sidebar = createSidebar();
+        splitPane.setLeftComponent(createSidebar());
         splitPane.setBorder(BorderFactory.createEmptyBorder());
-        splitPane.setLeftComponent(sidebar);
         splitPane.setRightComponent(circuit);
 
         frame.add(splitPane);
@@ -84,7 +81,7 @@ public class Window {
             }
         };
     
-        // Action pour le plein écran (F11)
+        // Action pour le plein écran (ctrl F)
         AbstractAction fullscreenAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -121,35 +118,38 @@ public class Window {
      * Creates the sidebar containing logic gate buttons and tools.
      * @return JPanel representing the sidebar
      */
-    private JPanel createSidebar() {
-        JPanel sidebar = new JPanel();
-        sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
-        sidebar.setBackground(new Color(26, 42, 84));
-        sidebar.setBorder(new EmptyBorder(10, 10, 10, 10));
+    private JScrollPane createSidebar() { 
+    JPanel sidebar = new JPanel();
+    sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
+    sidebar.setBackground(new Color(26, 42, 84));
+    sidebar.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        // Section Portes Logiques
-        addSection(sidebar, "PORTES LOGIQUES", new String[][] {
-                { "AND", "Porte ET" },
-                { "OR", "Porte OU" },
-                { "NOT", "Porte NON" },
-                { "XOR", "Porte OU-X" },
-                { "NAND", "Porte NON-ET" }
-        });
+    // Section Portes Logiques
+    addSection(sidebar, "PORTES LOGIQUES", new String[][] {
+            { "AND", "Porte ET" },
+            { "OR", "Porte OU" },
+            { "NOT", "Porte NON" },
+            { "XOR", "Porte OU-X" },
+            { "NAND", "Porte NON-ET" }
+    });
 
-        // Section Entrées/Sorties
-        addSection(sidebar, "ENTRÉES/SORTIES", new String[][] {
-                { "1", "Signal HIGH" },
-                { "0", "Signal LOW" },
-                { "LED", "Sortie LED" }
-        });
+    // Section Entrées/Sorties
+    addSection(sidebar, "ENTRÉES/SORTIES", new String[][] {
+            { "1", "Signal HIGH" },
+            { "0", "Signal LOW" },
+            { "LED", "Sortie LED" }
+    });
 
-        // Section Outils
-        addSection(sidebar, "OUTILS", new String[][] {
-                { "DELETE", "Mode Suppression" }
-        });
+    // Section Outils
+    addSection(sidebar, "OUTILS", new String[][] {
+            { "DELETE", "Mode Suppression" }
+    });
 
-        return sidebar;
-    }
+    // Ajout du JScrollPane autour du panel
+    JScrollPane scrollPane = new JScrollPane(sidebar);
+    scrollPane.setBorder(BorderFactory.createEmptyBorder());
+    return scrollPane;
+}
 
     /**
      * Adds a section to the sidebar with labeled buttons.
@@ -428,7 +428,7 @@ private void chargerCircuit() {
         editorPane.setContentType("text/html");
 
         try {
-            java.net.URL guideUrl = getClass().getResource("/guide/guide.html");
+            java.net.URL guideUrl = getClass().getResource("guide/guide.html");
 
             if (guideUrl != null) {
                 editorPane.setPage(guideUrl);
