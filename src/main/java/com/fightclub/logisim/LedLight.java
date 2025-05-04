@@ -29,7 +29,7 @@ public class LedLight extends MemoryComponent {
         if (getInputValue() == QuadBool.TRUE) {
             ledColor = Color.YELLOW; // Vert vif allumé
         } else if (getInputValue() == QuadBool.FALSE) {
-            ledColor = Color.BLACK; // Gris foncé éteint
+            ledColor = Color.GRAY; // Gris foncé éteint
         } else {
             ledColor = Color.GRAY  ; // Orange pour états spéciaux
         }
